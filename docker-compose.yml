@@ -2,4 +2,4 @@ services:
   bot:
     build: .
     volumes:
-      - .:/app
+      - ./src:/app/src

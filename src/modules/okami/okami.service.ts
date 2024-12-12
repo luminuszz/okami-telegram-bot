@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { AxiosError } from 'axios';
 import { firstValueFrom } from 'rxjs';
 import { Either, left, right } from '../helpers';
@@ -18,6 +18,8 @@ import {
 @Injectable()
 export class OkamiService {
   constructor(private readonly httpClient: HttpService) {}
+
+  private logger = new Logger(OkamiService.name);
 
   async updateTelegramChatId(data: UpdateTelegramChatId) {
     try {
@@ -66,7 +68,7 @@ export class OkamiService {
         ),
       );
 
-      right(response.data);
+      return right(response.data);
     } catch (err) {
       return left(err);
     }
