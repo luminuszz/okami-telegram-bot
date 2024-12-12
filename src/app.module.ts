@@ -1,10 +1,13 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { EnvModule } from './modules/env/env.module';
+import { OkamiModule } from './modules/okami/okami.module';
+import { QueueModule } from './modules/queue/queue.module';
+import { TelegramModule } from './modules/telegram/telegram.module';
 
 @Module({
-  imports: [],
+  imports: [EnvModule, QueueModule, OkamiModule, TelegramModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule {}
