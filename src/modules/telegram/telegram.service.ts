@@ -22,7 +22,7 @@ export class TelegramService implements OnModuleInit {
     @Inject(TELEGRAM_PROVIDER)
     private readonly bot: Telegraf,
   ) {}
-  async onModuleInit() {
+  onModuleInit() {
     this.bot.start((ctx) => {
       ctx.reply('Bem vindo ao Okami Bot Notifier');
       ctx.reply(
@@ -35,9 +35,9 @@ export class TelegramService implements OnModuleInit {
 
     this.handleReceivedMessage();
 
-    await this.bot.launch();
-
-    this.logger.debug('Bot is running');
+    this.bot.launch(() => {
+      this.logger.debug('Bot is running');
+    });
   }
 
   private handleReceivedMessage() {

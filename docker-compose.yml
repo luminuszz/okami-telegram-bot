@@ -1,9 +1,11 @@
 services:
   bot_service:
-    env_file:
-      - .env
     build:
       context: .
       dockerfile: ${DOCKERFILE_PATH}
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
     volumes:
       - ./src/:/app/src

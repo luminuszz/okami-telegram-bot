@@ -1,4 +1,4 @@
-import { Controller, Logger, OnModuleInit } from '@nestjs/common';
+import { Controller, Get, Logger, OnModuleInit } from '@nestjs/common';
 import { SqsQueueProvider } from './modules/queue/sqs-queue.provider';
 import { TelegramService } from './modules/telegram/telegram.service';
 import { Utils } from './utils/parse-message';
@@ -14,7 +14,7 @@ interface Notification {
   chatId: string;
 }
 
-@Controller()
+@Controller('/')
 export class AppController implements OnModuleInit {
   constructor(
     private readonly queue: SqsQueueProvider,
@@ -43,5 +43,15 @@ export class AppController implements OnModuleInit {
       imageUrl,
       chatId,
     });
+  }
+
+  @Get()
+  getHello() {
+    return 'Hello World!';
+  }
+
+  @Get('/debug-sentry')
+  getError() {
+    throw new Error('My first Sentry error!');
   }
 }
