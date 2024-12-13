@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { EnvModule } from '../env/env.module';
 import { OkamiModule } from '../okami/okami.module';
-import { telegrafProvider } from './telegraf.provider';
+import { telegrafProvider } from './providers/telegraf.provider';
 import { TelegramService } from './telegram.service';
 
 @Module({

@@ -1,11 +1,10 @@
+import { EnvService } from '@modules/env/env.service';
 import { Provider } from '@nestjs/common';
 import { Telegraf } from 'telegraf';
-import { EnvService } from '../env/env.service';
-
-export const TELEGRAF_PROVIDER = Symbol('TELEGRAF_PROVIDER');
+import { TELEGRAM_PROVIDER } from '.';
 
 export const telegrafProvider: Provider = {
-  provide: TELEGRAF_PROVIDER,
+  provide: TELEGRAM_PROVIDER,
   async useFactory(env: EnvService) {
     return new Telegraf(env.get('TELEGRAM_NOTIFICATION_BOT'));
   },

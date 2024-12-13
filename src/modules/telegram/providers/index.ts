@@ -1,0 +1,1 @@
+export const TELEGRAM_PROVIDER = Symbol('TELEGRAM_BOT_PROVIDER');

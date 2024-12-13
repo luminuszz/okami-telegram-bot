@@ -1,9 +1,8 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Telegraf } from 'telegraf';
 import { message } from 'telegraf/filters';
-import { EnvService } from '../env/env.service';
 import { OkamiService } from '../okami/okami.service';
-import { TELEGRAF_PROVIDER } from './telegraf.provider';
+import { TELEGRAM_PROVIDER } from './providers';
 import {
   SendMessagePayload,
   UserMetadata,
@@ -12,41 +11,33 @@ import {
 } from './utils';
 
 @Injectable()
-export class TelegramService {
+export class TelegramService implements OnModuleInit {
   private memoryUsers = new Map<string, UserMetadata>();
 
   private logger = new Logger(TelegramService.name);
 
   constructor(
-    private readonly env: EnvService,
     private readonly okami: OkamiService,
-    @Inject(TELEGRAF_PROVIDER)
-    private bot: Telegraf,
-  ) {
-    this.startBot();
-    this.logger.debug('TelegramService initialized');
-  }
 
-  async startBot() {
-    try {
-      this.bot.start((ctx) => {
-        ctx.reply('Bem vindo ao Okami Bot Notifier');
-        ctx.reply(
-          'Para receber notificações das suas obras favoritas, use o comando /vincularchat',
-        );
-      });
+    @Inject(TELEGRAM_PROVIDER)
+    private readonly bot: Telegraf,
+  ) {}
+  async onModuleInit() {
+    this.bot.start((ctx) => {
+      ctx.reply('Bem vindo ao Okami Bot Notifier');
+      ctx.reply(
+        'Para receber notificações das suas obras favoritas, use o comando /vincularchat',
+      );
+    });
 
-      this.runVincularChatCommand();
-      this.runConfirmarChatCommand();
+    this.runVincularChatCommand();
+    this.runConfirmarChatCommand();
 
-      this.handleReceivedMessage();
+    this.handleReceivedMessage();
 
-      await this.bot.launch();
+    await this.bot.launch();
 
-      this.logger.debug('Bot is running');
-    } catch (e) {
-      this.logger.error(e);
-    }
+    this.logger.debug('Bot is running');
   }
 
   private handleReceivedMessage() {

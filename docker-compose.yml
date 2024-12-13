@@ -1,5 +1,9 @@
 services:
-  bot:
-    build: .
+  bot_service:
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE_PATH}
     volumes:
-      - ./src:/app/src
+      - ./src/:/app/src

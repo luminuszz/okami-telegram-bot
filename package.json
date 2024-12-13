@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "nest build && pnpm sentry:sourcemaps",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -18,7 +18,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "container": "docker compose up -d --build"
+    "container": "docker compose up -d --build",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org okami-mr --project okami-telegram-bot ./dist && sentry-cli sourcemaps upload --org okami-mr --project okami-telegram-bot ./dist"
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.709.0",
@@ -27,6 +28,11 @@
     "@nestjs/config": "^3.3.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
+    "@sentry/cli": "^2.39.1",
+    "@sentry/nestjs": "^8.45.0",
+    "@sentry/profiling-node": "^8.45.0",
+    "@swc/cli": "^0.5.2",
+    "@swc/core": "^1.10.1",
     "axios": "^1.7.9",
     "pm2": "^5.4.3",
     "reflect-metadata": "^0.2.0",

@@ -1,6 +1,7 @@
-import { Controller, OnModuleInit } from '@nestjs/common';
+import { Controller, Logger, OnModuleInit } from '@nestjs/common';
 import { SqsQueueProvider } from './modules/queue/sqs-queue.provider';
 import { TelegramService } from './modules/telegram/telegram.service';
+import { Utils } from './utils/parse-message';
 
 interface Notification {
   name: string;
@@ -20,32 +21,22 @@ export class AppController implements OnModuleInit {
     private readonly telegramService: TelegramService,
   ) {}
 
+  private logger = new Logger(AppController.name);
+
   async onModuleInit() {
+    this.logger.log('Listening for SEND_TELEGRAM_NOTIFICATION messages');
+
     this.queue.subscribe('SEND_TELEGRAM_NOTIFICATION', (data) =>
       this.sendUnreadWorkTelegramNotification(data),
     );
   }
 
-  private parseContent(content: string): string {
-    return content
-      .replaceAll('_', '\\_')
-      .replaceAll('**', '\\**')
-      .replaceAll('[', '\\[')
-      .replaceAll(']', '\\]')
-      .replaceAll('`', '\\`')
-      .replaceAll('-', '\\-')
-      .replaceAll('(', '\\(')
-      .replaceAll(')', '\\)')
-      .replaceAll('.', '\\.')
-      .replaceAll('!', '\\!')
-      .replaceAll('>', '\\>')
-      .replaceAll('<', '\\<');
-  }
-
   async sendUnreadWorkTelegramNotification(notification: Notification) {
     const { message, url, imageUrl, chatId } = notification;
 
-    const parsedMessage = this.parseContent(`${message.toString()}\n\n${url}`);
+    const parsedMessage = Utils.parseTelegramMessage(
+      `${message.toString()}\n\n${url}`,
+    );
 
     await this.telegramService.sendMessage({
       message: parsedMessage,
