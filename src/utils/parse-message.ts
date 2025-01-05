@@ -12,6 +12,9 @@ export class Utils {
       .replaceAll('.', '\\.')
       .replaceAll('!', '\\!')
       .replaceAll('>', '\\>')
-      .replaceAll('<', '\\<');
+      .replaceAll('<', '\\<')
+      .replaceAll('=', '\\=');
   }
 }
+
+

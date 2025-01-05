@@ -1,5 +1,6 @@
 services:
   bot_service:
+    restart: always
     build:
       context: .
       dockerfile: ${DOCKERFILE_PATH}
