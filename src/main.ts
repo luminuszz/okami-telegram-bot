@@ -1,5 +1,3 @@
-import './config/handler-sentry-setup';
-
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
