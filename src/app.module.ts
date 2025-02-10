@@ -5,9 +5,11 @@ import { OkamiModule } from '@modules/okami/okami.module';
 import { QueueModule } from '@modules/queue/queue.module';
 import { TelegramModule } from '@modules/telegram/telegram.module';
 import { TerminusModule } from '@nestjs/terminus';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     TerminusModule,
     EnvModule,
     QueueModule,
