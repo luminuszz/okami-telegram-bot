@@ -27,6 +27,7 @@
     "@nestjs/config": "^3.3.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/terminus": "^11.0.0",
     "@sentry/cli": "^2.39.1",
     "@sentry/nestjs": "^8.45.0",
     "@sentry/profiling-node": "^8.45.0",

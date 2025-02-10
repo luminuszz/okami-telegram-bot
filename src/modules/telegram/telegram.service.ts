@@ -9,6 +9,8 @@ import {
   payloadAthCodeSchema,
   payloadEmailSchema,
 } from './utils';
+import { HealthIndicatorService } from '@nestjs/terminus';
+import { HealthIndicatorSession } from '@nestjs/terminus/dist/health-indicator/health-indicator.service';
 
 @Injectable()
 export class TelegramService implements OnModuleInit {
@@ -16,13 +18,18 @@ export class TelegramService implements OnModuleInit {
 
   private logger = new Logger(TelegramService.name);
 
+  private indicator: HealthIndicatorSession;
+
   constructor(
     private readonly okami: OkamiService,
-
     @Inject(TELEGRAM_PROVIDER)
     private readonly bot: Telegraf,
+    private readonly healthIndicator: HealthIndicatorService,
   ) {}
+
   onModuleInit() {
+    this.indicator = this.healthIndicator.check('telegram_bot');
+
     this.bot.start((ctx) => {
       ctx.reply('Bem vindo ao Okami Bot Notifier');
       ctx.reply(
@@ -135,6 +142,17 @@ export class TelegramService implements OnModuleInit {
       await this.bot.telegram.sendMessage(chatId, message, {
         parse_mode: 'MarkdownV2',
       });
+    }
+  }
+
+  async healthCheck() {
+    try {
+      const botInfo = await this.bot.telegram.getMe();
+      this.logger.debug(`Bot is running. Username: ${botInfo.username}`);
+      return this.indicator.up();
+    } catch (error) {
+      this.logger.error('Bot is not running', error);
+      return this.indicator.down(error);
     }
   }
 }

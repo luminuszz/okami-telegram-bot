@@ -7,15 +7,23 @@ import {
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { Consumer } from 'sqs-consumer';
 import { EnvService } from '../env/env.service';
+import { HealthIndicatorSession } from '@nestjs/terminus/dist/health-indicator/health-indicator.service';
+import { HealthIndicatorService } from '@nestjs/terminus';
 
 @Injectable()
 export class SqsQueueProvider implements OnModuleDestroy {
   private consumers = new Map<string, Consumer>();
   private logger = new Logger(SqsQueueProvider.name);
+  private indicator: HealthIndicatorSession;
 
   private readonly sqs: SQSClient;
 
-  constructor(private readonly env: EnvService) {
+  constructor(
+    private readonly env: EnvService,
+    private readonly healthIndicator: HealthIndicatorService,
+  ) {
+    this.indicator = this.healthIndicator.check('queue_provider');
+
     this.sqs = new SQSClient({
       region: this.env.get('AWS_REGION'),
       credentials: {
@@ -96,5 +104,24 @@ export class SqsQueueProvider implements OnModuleDestroy {
       consumer.removeAllListeners();
       consumer.stop();
     });
+  }
+
+  async healthCheck() {
+    const checkList: { name: string; active: boolean }[] = [];
+
+    for (const [key, consumer] of this.consumers.entries()) {
+      checkList.push({
+        name: key,
+        active: consumer.status.isRunning,
+      });
+
+      this.logger.debug(
+        `Health check for ${key}: ${consumer.status.isRunning}`,
+      );
+    }
+
+    const isHeath = checkList.every((check) => check.active);
+
+    return isHeath ? this.indicator.up() : this.indicator.down();
   }
 }

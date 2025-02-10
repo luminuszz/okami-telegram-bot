@@ -7,6 +7,7 @@ export const envSchema = z.object({
   AWS_ACCESS_KEY_ID: z.string(),
   AWS_SECRET_KEY_ACCESS: z.string(),
   AWS_REGION: z.string(),
+  PORT: z.coerce.number(),
 });
 
 export type EnvType = z.infer<typeof envSchema>;
