@@ -1,7 +1,15 @@
 import { Controller, Get, Logger, OnModuleInit } from '@nestjs/common';
-import { SqsQueueProvider } from './modules/queue/sqs-queue.provider';
-import { TelegramService } from './modules/telegram/telegram.service';
+import { SqsQueueProvider } from '@modules/queue/sqs-queue.provider';
+import { TelegramService } from '@modules/telegram/telegram.service';
 import { Utils } from './utils/parse-message';
+import {
+  HealthCheck,
+  HealthCheckService,
+  HttpHealthIndicator,
+  MemoryHealthIndicator,
+} from '@nestjs/terminus';
+import { EnvService } from '@modules/env/env.service';
+import { AxiosResponse } from 'axios';
 
 interface Notification {
   name: string;
@@ -19,14 +27,18 @@ export class AppController implements OnModuleInit {
   constructor(
     private readonly queue: SqsQueueProvider,
     private readonly telegramService: TelegramService,
+    private readonly healtCheckService: HealthCheckService,
+    private memory: MemoryHealthIndicator,
+    private http: HttpHealthIndicator,
+    private readonly envService: EnvService,
   ) {}
 
   private logger = new Logger(AppController.name);
 
-  async onModuleInit() {
+  onModuleInit() {
     this.logger.log('Listening for SEND_TELEGRAM_NOTIFICATION messages');
 
-    this.queue.subscribe('SEND_TELEGRAM_NOTIFICATION', (data) =>
+    void this.queue.subscribe('SEND_TELEGRAM_NOTIFICATION', (data) =>
       this.sendUnreadWorkTelegramNotification(data),
     );
   }
@@ -45,13 +57,24 @@ export class AppController implements OnModuleInit {
     });
   }
 
-  @Get()
-  getHello() {
-    return 'Hello World!';
-  }
-
   @Get('/debug-sentry')
   getError() {
     throw new Error('My first Sentry error!');
+  }
+
+  @HealthCheck()
+  @Get('health')
+  async healthCheck() {
+    return this.healtCheckService.check([
+      () => this.telegramService.healthCheck(),
+      () => this.queue.healthCheck(),
+      () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),
+      () =>
+        this.http.responseCheck(
+          'okami_platform_integration',
+          `${this.envService.get('OKAMI_API_URL')}/health`,
+          (res: AxiosResponse<{ status: string }>) => res.data.status === 'ok',
+        ),
+    ]);
   }
 }

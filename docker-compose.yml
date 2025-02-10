@@ -1,6 +1,8 @@
 services:
   bot_service:
     restart: always
+    ports:
+      - "${PORT}:${PORT}"
     build:
       context: .
       dockerfile: ${DOCKERFILE_PATH}

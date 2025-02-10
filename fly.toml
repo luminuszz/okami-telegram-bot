@@ -8,6 +8,17 @@ primary_region = 'gig'
 
 [build]
 
+[checks]
+[checks.okami_check_status]
+grace_period = "30s"
+interval = "15s"
+method = "get"
+path = "/health"
+port = 3000
+timeout = "10s"
+type = "http"
+
+
 [http_service]
 internal_port = 3000
 force_https = true
