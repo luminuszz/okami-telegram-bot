@@ -12,7 +12,6 @@ import { ChatRepository } from '@modules/database/chat.repository';
 @Injectable()
 export class ClassNotificationBotService implements OnModuleInit {
   private logger = new Logger(ClassNotificationBotService.name);
-  private chatsId: string[] = [];
   private indicator: HealthIndicatorSession;
 
   constructor(
@@ -83,12 +82,20 @@ export class ClassNotificationBotService implements OnModuleInit {
 
   async runVincularChatCommand() {
     this.bot.command('vincular_chat', async (ctx) => {
-      await this.saveChatId(String(ctx.chat.id));
+      try {
+        await ctx.reply(
+          '⏳ Vinculando seu chat... Por favor, aguarde um momento.',
+        );
 
-      await ctx.reply('Chat vinculado com sucesso');
-      await ctx.reply(
-        'Você receberá notificações de aulas todos os dias as 16:00',
-      );
+        await this.saveChatId(String(ctx.chat.id));
+        await ctx.reply(
+          '✅ Pronto! Seu chat foi vinculado com sucesso. 📲 Agora você receberá um lembrete diário das aulas às ⏰ 16:00. Fique de olho! 👀',
+        );
+      } catch (e) {
+        console.error(e);
+        await ctx.reply('Erro ao vincular chat');
+        this.logger.debug(e);
+      }
     });
   }
 
@@ -96,12 +103,20 @@ export class ClassNotificationBotService implements OnModuleInit {
     this.bot.command('desvincular_chat', async (ctx) => {
       await this.removeChatId(String(ctx.chat.id));
 
-      await ctx.reply('Chat desvinculado com sucesso');
-      await ctx.reply('Você não receberá mais notificações de aulas');
+      await ctx.reply(
+        '🔄 Desvinculando seu chat... Por favor, aguarde um instante.',
+      );
+
+      await this.removeChatId(String(ctx.chat.id));
+
+      await ctx.reply('✅ Chat desvinculado com sucesso! ❌');
+      await ctx.reply(
+        '🚫 Você não receberá mais notificações de aulas. Se mudar de ideia, é só vincular novamente!',
+      );
     });
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_4PM)
+  @Cron(CronExpression.EVERY_DAY_AT_4PM, { timeZone: 'America/Bahia' })
   async runDayClassNotificationJob() {
     const currentDayNumber = getDay(new Date());
 

@@ -12,15 +12,11 @@ export class ChatRepository {
   ) {}
 
   async saveChat(chatId: string) {
-    const { data: existsNote, error } = await this.supabase
+    const { data: existsNote } = await this.supabase
       .from('chats')
       .select()
       .eq('chat_id', chatId)
       .single();
-
-    if (error) {
-      throw new Error(error.message);
-    }
 
     if (!existsNote) {
       const { error } = await this.supabase.from('chats').insert([
