@@ -1,16 +1,16 @@
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { HealthIndicatorService } from '@nestjs/terminus';
+import { HealthIndicatorSession } from '@nestjs/terminus/dist/health-indicator/health-indicator.service';
 import { Telegraf } from 'telegraf';
 import { message } from 'telegraf/filters';
-import { OkamiService } from '../okami/okami.service';
-import { TELEGRAM_PROVIDER } from './providers';
+import { OkamiService } from '../../okami/okami.service';
+import { TELEGRAM_PROVIDER } from '../providers';
 import {
   SendMessagePayload,
   UserMetadata,
   payloadAthCodeSchema,
   payloadEmailSchema,
-} from './utils';
-import { HealthIndicatorService } from '@nestjs/terminus';
-import { HealthIndicatorSession } from '@nestjs/terminus/dist/health-indicator/health-indicator.service';
+} from '../utils';
 
 @Injectable()
 export class TelegramService implements OnModuleInit {
