@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const envSchema = z.object({
   TELEGRAM_NOTIFICATION_BOT: z.string(),
   TELEGRAM_CLASS_NOTIFICATION_BOT: z.string(),
+  TELEGRAM_REMEMBER_REDMINE_BOT: z.string(),
   OKAMI_API_URL: z.string(),
   OKAMI_API_ACCESS_TOKEN: z.string(),
   AWS_ACCESS_KEY_ID: z.string(),
