@@ -8,9 +8,10 @@ import {
 import { TelegramService } from './telegram.service';
 import { TerminusModule } from '@nestjs/terminus';
 import { ClassNotificationBotService } from '@modules/telegram/class-notification-bot.service';
+import { DatabaseModule } from '@modules/database/database.module';
 
 @Module({
-  imports: [EnvModule, OkamiModule, TerminusModule],
+  imports: [EnvModule, OkamiModule, TerminusModule, DatabaseModule],
   providers: [
     telegrafProvider,
     telegrafClassNotificationProviderBot,

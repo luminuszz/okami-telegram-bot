@@ -7,6 +7,7 @@ import { getDay } from 'date-fns';
 import { classes, ClassRoom } from '@app/utils/constants';
 import { Utils } from '@app/utils/parse-message';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { ChatRepository } from '@modules/database/chat.repository';
 
 @Injectable()
 export class ClassNotificationBotService implements OnModuleInit {
@@ -18,6 +19,7 @@ export class ClassNotificationBotService implements OnModuleInit {
     @Inject(CLASS_NOTIFICATION_BOT_PROVIDER)
     private readonly bot: Telegraf,
     private readonly healthIndicator: HealthIndicatorService,
+    private readonly chatRepository: ChatRepository,
   ) {}
 
   async onModuleInit() {
@@ -49,12 +51,12 @@ export class ClassNotificationBotService implements OnModuleInit {
     });
   }
 
-  private saveChatId(chatId: string) {
-    this.chatsId.push(chatId);
+  private async saveChatId(chatId: string) {
+    await this.chatRepository.saveChat(chatId);
   }
 
-  private removeChatId(chatId: string) {
-    this.chatsId = this.chatsId.filter((id) => id !== chatId);
+  private async removeChatId(chatId: string) {
+    await this.chatRepository.deleteByChatId(chatId);
   }
 
   async whatsTodayClassCommand() {
@@ -81,17 +83,21 @@ export class ClassNotificationBotService implements OnModuleInit {
 
   async runVincularChatCommand() {
     this.bot.command('vincular_chat', async (ctx) => {
-      this.saveChatId(String(ctx.chat.id));
+      await this.saveChatId(String(ctx.chat.id));
 
-      return ctx.reply('Chat vinculado com sucesso');
+      await ctx.reply('Chat vinculado com sucesso');
+      await ctx.reply(
+        'Você receberá notificações de aulas todos os dias as 16:00',
+      );
     });
   }
 
   async runDesvincularChatCommand() {
     this.bot.command('desvincular_chat', async (ctx) => {
-      this.removeChatId(String(ctx.chat.id));
+      await this.removeChatId(String(ctx.chat.id));
 
-      return ctx.reply('Chat desvinculado com sucesso');
+      await ctx.reply('Chat desvinculado com sucesso');
+      await ctx.reply('Você não receberá mais notificações de aulas');
     });
   }
 
@@ -99,19 +105,20 @@ export class ClassNotificationBotService implements OnModuleInit {
   async runDayClassNotificationJob() {
     const currentDayNumber = getDay(new Date());
 
-    const currentClassForDay = classes.find(
-      (classItem) => classItem.dayNumber === currentDayNumber,
-    );
-
-    if (!currentClassForDay) {
-      return;
-    }
-
-    for (const chatId of this.chatsId) {
-      await this.showDayClassByChat(
-        this.parseClassNotificationMessage(currentClassForDay),
-        chatId,
+    for await (const chats of this.chatRepository.getChatsInBatches()) {
+      const currentClassForDay = classes.find(
+        (classItem) => classItem.dayNumber === currentDayNumber,
       );
+
+      if (!currentClassForDay) {
+        return;
+      }
+
+      const message = this.parseClassNotificationMessage(currentClassForDay);
+
+      for (const chat of chats) {
+        await this.showDayClassByChat(message, chat.chat_id);
+      }
     }
   }
 

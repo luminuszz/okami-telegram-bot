@@ -9,6 +9,9 @@ export const envSchema = z.object({
   AWS_SECRET_KEY_ACCESS: z.string(),
   AWS_REGION: z.string(),
   PORT: z.coerce.number(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string(),
+  SUPABASE_ANON_KEY: z.string(),
+  SUPABASE_URL: z.string().url(),
 });
 
 export type EnvType = z.infer<typeof envSchema>;

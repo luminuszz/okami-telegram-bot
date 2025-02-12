@@ -30,19 +30,18 @@ export class TelegramService implements OnModuleInit {
   onModuleInit() {
     this.indicator = this.healthIndicator.check('telegram_bot');
 
-    this.bot.start((ctx) => {
-      ctx.reply('Bem vindo ao Okami Bot Notifier');
-      ctx.reply(
+    this.bot.start(async (ctx) => {
+      await ctx.reply('Bem vindo ao Okami Bot Notifier');
+      await ctx.reply(
         'Para receber notificações das suas obras favoritas, use o comando /vincularchat',
       );
     });
 
     this.runVincularChatCommand();
     this.runConfirmarChatCommand();
-
     this.handleReceivedMessage();
 
-    this.bot.launch(() => {
+    void this.bot.launch(() => {
       this.logger.debug('Bot is running');
     });
   }
