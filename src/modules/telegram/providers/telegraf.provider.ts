@@ -25,6 +25,8 @@ export const telegrafClassNotificationProviderBot: Provider = {
 
 export const telegrafRememberRedmineBotProvider: Provider = {
   provide: TELEGRAM_REMEMBER_REDMINE_BOT_PROVIDER,
-  useFactory(env: EnvService) {},
+  useFactory(env: EnvService) {
+    return new Telegraf(env.get('TELEGRAM_REMEMBER_REDMINE_BOT'));
+  },
   inject: [EnvService],
 };

@@ -1,15 +1,15 @@
-import { Controller, Get, Logger, OnModuleInit } from '@nestjs/common';
+import { TelegramService } from '@app/modules/telegram/bots/telegram.service';
+import { EnvService } from '@modules/env/env.service';
 import { SqsQueueProvider } from '@modules/queue/sqs-queue.provider';
-import { TelegramService } from '@modules/telegram/telegram.service';
-import { Utils } from './utils/parse-message';
+import { Controller, Get, Logger, OnModuleInit } from '@nestjs/common';
 import {
   HealthCheck,
   HealthCheckService,
   HttpHealthIndicator,
   MemoryHealthIndicator,
 } from '@nestjs/terminus';
-import { EnvService } from '@modules/env/env.service';
 import { AxiosResponse } from 'axios';
+import { Utils } from './utils/parse-message';
 
 interface Notification {
   name: string;

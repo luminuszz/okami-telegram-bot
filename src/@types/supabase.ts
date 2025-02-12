@@ -52,6 +52,27 @@ export type Database = {
         }
         Relationships: []
       }
+      redmine_chats: {
+        Row: {
+          chat_id: string
+          created_at: string
+          id: number
+          nmProject: string | null
+        }
+        Insert: {
+          chat_id: string
+          created_at?: string
+          id?: number
+          nmProject?: string | null
+        }
+        Update: {
+          chat_id?: string
+          created_at?: string
+          id?: number
+          nmProject?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
