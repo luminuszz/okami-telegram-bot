@@ -1,7 +1,13 @@
 import { RedmineChatRepository } from '@modules/database/repository/redmine-chat.respository';
 import { Utils } from '@app/utils/parse-message';
 import { TELEGRAM_REMEMBER_REDMINE_BOT_PROVIDER } from '@modules/telegram/providers';
-import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { Telegraf } from 'telegraf';
 import { message } from 'telegraf/filters';
 import { Cron } from '@nestjs/schedule';
@@ -12,7 +18,9 @@ import { EnvService } from '@modules/env/env.service';
 export const EVERY_MONDAY_AT_9AM = '0 9 * * 1';
 
 @Injectable()
-export class RememberRedmineBot implements OnModuleInit {
+export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
+  private readonly memoryUsers = new Map<string, boolean>();
+
   constructor(
     @Inject(TELEGRAM_REMEMBER_REDMINE_BOT_PROVIDER)
     private readonly bot: Telegraf,
@@ -45,6 +53,11 @@ export class RememberRedmineBot implements OnModuleInit {
     });
   }
 
+  async onModuleDestroy() {
+    this.memoryUsers.clear();
+    await this.bot.stop();
+  }
+
   async showNotification() {
     this.bot.command('notificar', async (ctx, next) => {
       const chat = await this.redmineChatRepository.findByChatId(
@@ -72,12 +85,23 @@ export class RememberRedmineBot implements OnModuleInit {
   }
 
   async runVincularChatCommand() {
-    this.bot.command('vincularchat', async (ctx, next) => {
+    this.bot.command('vincular_chat', async (ctx) => {
+      const chatId = String(ctx.chat.id);
+
       await ctx.reply(
         'Por favor, me informe o nome do projeto que deseja ser notificado',
       );
 
       this.bot.on(message('text'), async (ctx, next) => {
+        const alreadySaved = this.memoryUsers.get(chatId);
+
+        if (alreadySaved) {
+          await ctx.reply(
+            'Você já está vinculado a um projeto. Use o comando /desvincular_chat para desvincular o projeto atual',
+          );
+          return next();
+        }
+
         await ctx.reply(
           '⏳ Vinculando seu chat... Por favor, aguarde um momento.',
         );
@@ -86,19 +110,19 @@ export class RememberRedmineBot implements OnModuleInit {
 
         await this.saveChat(String(ctx.chat.id), projectName);
 
+        this.memoryUsers.set(String(ctx.chat.id), true);
+
         await ctx.reply(
           '✅ Pronto! Seu chat foi vinculado com sucesso. 📲 Agora você receberá um lembrete semanal para preencher o redmine toda segunda, ⏰ 09:00. Fique de olho! 👀',
         );
 
-        return next();
+        await next();
       });
-
-      return next();
     });
   }
 
   async desvincularChatCommand() {
-    this.bot.command('desvincularchat', async (ctx, next) => {
+    this.bot.command('desvincular_chat', async (ctx, next) => {
       await this.deleteChat(String(ctx.chat.id));
 
       await ctx.reply('Chat desvinculado com sucesso!');
