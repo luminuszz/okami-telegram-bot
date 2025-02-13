@@ -13,7 +13,7 @@ export const envSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string(),
   SUPABASE_ANON_KEY: z.string(),
   SUPABASE_URL: z.string().url(),
-  TELEGRAM_REDMINE_NOTIFICATION: z.string(),
+  REMEMBER_REDMINE_URL: z.string().url(),
 });
 
 export type EnvType = z.infer<typeof envSchema>;
