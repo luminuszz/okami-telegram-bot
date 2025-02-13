@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   SUPABASE_DATABASE_PROVIDER,
   SupabaseDatabaseProvider,
-} from './supabase-database.provider';
+} from '../supabase-database.provider';
 
 @Injectable()
 export class RedmineChatRepository {
@@ -64,5 +64,15 @@ export class RedmineChatRepository {
       yield chats;
       offset += batchSize;
     }
+  }
+
+  async findByChatId(chatId: string) {
+    const { data, error } = await this.supabase
+      .from('redmine_chats')
+      .select()
+      .eq('chat_id', chatId)
+      .single();
+
+    return !!error ? null : data;
   }
 }

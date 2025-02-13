@@ -7,7 +7,7 @@ import { getDay } from 'date-fns';
 import { classes, ClassRoom } from '@app/utils/constants';
 import { Utils } from '@app/utils/parse-message';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { ChatRepository } from '@modules/database/chat.repository';
+import { ChatRepository } from '@modules/database/repository/chat.repository';
 
 @Injectable()
 export class ClassNotificationBotService implements OnModuleInit {
@@ -106,8 +106,6 @@ export class ClassNotificationBotService implements OnModuleInit {
       await ctx.reply(
         '🔄 Desvinculando seu chat... Por favor, aguarde um instante.',
       );
-
-      await this.removeChatId(String(ctx.chat.id));
 
       await ctx.reply('✅ Chat desvinculado com sucesso! ❌');
       await ctx.reply(

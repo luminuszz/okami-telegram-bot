@@ -10,6 +10,7 @@ import {
   telegrafProvider,
   telegrafRememberRedmineBotProvider,
 } from './providers/telegraf.provider';
+import { RememberRedmineBot } from '@modules/telegram/bots/remember-redmine-bot.service';
 
 @Module({
   imports: [EnvModule, OkamiModule, TerminusModule, DatabaseModule],
@@ -19,6 +20,7 @@ import {
     TelegramService,
     telegrafRememberRedmineBotProvider,
     ClassNotificationBotService,
+    RememberRedmineBot,
   ],
   exports: [TelegramService],
 })
