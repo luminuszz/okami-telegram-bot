@@ -90,10 +90,10 @@ export class RememberRedmineBot implements OnModuleInit {
           '✅ Pronto! Seu chat foi vinculado com sucesso. 📲 Agora você receberá um lembrete semanal para preencher o redmine toda segunda, ⏰ 09:00. Fique de olho! 👀',
         );
 
-        await next();
+        return next();
       });
 
-      await next();
+      return next();
     });
   }
 
