@@ -11,11 +11,11 @@ import {
 import { Telegraf } from 'telegraf';
 import { message } from 'telegraf/filters';
 import { Cron } from '@nestjs/schedule';
-import { format, startOfWeek, subWeeks } from 'date-fns';
+import { format, startOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { EnvService } from '@modules/env/env.service';
 
-export const EVERY_MONDAY_AT_9AM = '0 9 * * 1';
+export const EVERY_FRIDAY_AT_16_PM = '0 16 * * 5';
 
 @Injectable()
 export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
@@ -113,7 +113,7 @@ export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
         this.memoryUsers.set(String(ctx.chat.id), true);
 
         await ctx.reply(
-          '✅ Pronto! Seu chat foi vinculado com sucesso. 📲 Agora você receberá um lembrete semanal para preencher o redmine toda segunda, ⏰ 09:00. Fique de olho! 👀',
+          '✅ Pronto! Seu chat foi vinculado com sucesso. 📲 Agora você receberá um lembrete semanal para preencher o redmine toda sexta-feira, ⏰ 16:00. Fique de olho! 👀',
         );
 
         await next();
@@ -132,7 +132,7 @@ export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
   }
 
   private mountRedmineUrl(): string {
-    const lastMondayDate = startOfWeek(subWeeks(new Date(), 1), {
+    const lastMondayDate = startOfWeek(new Date(), {
       weekStartsOn: 1,
       locale: ptBR,
     });
@@ -175,7 +175,7 @@ export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
     );
   }
 
-  @Cron(EVERY_MONDAY_AT_9AM, { timeZone: 'America/Bahia' })
+  @Cron(EVERY_FRIDAY_AT_16_PM, { timeZone: 'America/Bahia' })
   async runWeekRedmineNotificationJob() {
     for await (const chats of this.redmineChatRepository.getChatsInBatches()) {
       for (const chat of chats) {
