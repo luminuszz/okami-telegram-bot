@@ -27,7 +27,7 @@ export class AppController implements OnModuleInit {
   constructor(
     private readonly queue: SqsQueueProvider,
     private readonly telegramService: TelegramService,
-    private readonly healtCheckService: HealthCheckService,
+    private readonly healthCheckService: HealthCheckService,
     private memory: MemoryHealthIndicator,
     private http: HttpHealthIndicator,
     private readonly envService: EnvService,
@@ -36,8 +36,6 @@ export class AppController implements OnModuleInit {
   private logger = new Logger(AppController.name);
 
   onModuleInit() {
-    this.logger.log('Listening for SEND_TELEGRAM_NOTIFICATION messages');
-
     void this.queue.subscribe('SEND_TELEGRAM_NOTIFICATION', (data) =>
       this.sendUnreadWorkTelegramNotification(data),
     );
@@ -65,7 +63,7 @@ export class AppController implements OnModuleInit {
   @HealthCheck()
   @Get('health')
   async healthCheck() {
-    return this.healtCheckService.check([
+    return this.healthCheckService.check([
       () => this.telegramService.healthCheck(),
       () => this.queue.healthCheck(),
       () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),

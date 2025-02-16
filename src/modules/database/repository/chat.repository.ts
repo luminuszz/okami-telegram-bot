@@ -1,8 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
 import {
   SUPABASE_DATABASE_PROVIDER,
   SupabaseDatabaseProvider,
 } from '@modules/database/supabase-database.provider';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class ChatRepository {
@@ -10,6 +10,8 @@ export class ChatRepository {
     @Inject(SUPABASE_DATABASE_PROVIDER)
     private readonly supabase: SupabaseDatabaseProvider,
   ) {}
+
+  private logger = new Logger(ChatRepository.name);
 
   async saveChat(chatId: string) {
     const { data: existsNote } = await this.supabase
@@ -63,5 +65,32 @@ export class ChatRepository {
       yield chats;
       offset += batchSize;
     }
+  }
+
+  async fetchClassesBySemester(semesterId: number) {
+    const { data: classes, error } = await this.supabase
+      .from('class')
+      .select()
+      .eq('semester_id', semesterId);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return classes;
+  }
+
+  async findActiveSemester() {
+    const { data, error } = await this.supabase
+      .from('semesters')
+      .select('*')
+      .eq('active', true)
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
   }
 }

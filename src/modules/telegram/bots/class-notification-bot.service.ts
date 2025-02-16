@@ -4,7 +4,7 @@ import { CLASS_NOTIFICATION_BOT_PROVIDER } from '@modules/telegram/providers';
 import { Telegraf } from 'telegraf';
 import { HealthIndicatorService } from '@nestjs/terminus';
 import { getDay } from 'date-fns';
-import { classes, ClassRoom } from '@app/utils/constants';
+import { ClassRoom } from '@app/utils/constants';
 import { Utils } from '@app/utils/parse-message';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ChatRepository } from '@modules/database/repository/chat.repository';
@@ -14,12 +14,26 @@ export class ClassNotificationBotService implements OnModuleInit {
   private logger = new Logger(ClassNotificationBotService.name);
   private indicator: HealthIndicatorSession;
 
+  private classes: ClassRoom[];
+
   constructor(
     @Inject(CLASS_NOTIFICATION_BOT_PROVIDER)
     private readonly bot: Telegraf,
     private readonly healthIndicator: HealthIndicatorService,
     private readonly chatRepository: ChatRepository,
   ) {}
+
+  public async getClassesForActiveSemester() {
+    if (!this.classes || this.classes.length === 0) {
+      const activeSemester = await this.chatRepository.findActiveSemester();
+
+      this.classes = await this.chatRepository.fetchClassesBySemester(
+        activeSemester.id,
+      );
+    }
+
+    return this.classes;
+  }
 
   async onModuleInit() {
     this.logger.debug('Class Notification bot initialized');
@@ -64,7 +78,7 @@ export class ClassNotificationBotService implements OnModuleInit {
 
       const currentDayNumber = getDay(new Date());
 
-      console.log(currentDayNumber);
+      const classes = await this.getClassesForActiveSemester();
 
       const currentClassForDay = classes.find(
         (classItem) => classItem.dayNumber === currentDayNumber,
@@ -119,6 +133,8 @@ export class ClassNotificationBotService implements OnModuleInit {
     const currentDayNumber = getDay(new Date());
 
     for await (const chats of this.chatRepository.getChatsInBatches()) {
+      const classes = await this.getClassesForActiveSemester();
+
       const currentClassForDay = classes.find(
         (classItem) => classItem.dayNumber === currentDayNumber,
       );

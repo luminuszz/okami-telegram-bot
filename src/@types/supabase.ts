@@ -52,6 +52,47 @@ export type Database = {
         }
         Relationships: []
       }
+      class: {
+        Row: {
+          created_at: string
+          day: string | null
+          dayNumber: number
+          id: number
+          room: string
+          semester_id: number
+          subject: string
+          teacher: string
+        }
+        Insert: {
+          created_at?: string
+          day?: string | null
+          dayNumber: number
+          id?: number
+          room: string
+          semester_id: number
+          subject: string
+          teacher: string
+        }
+        Update: {
+          created_at?: string
+          day?: string | null
+          dayNumber?: number
+          id?: number
+          room?: string
+          semester_id?: number
+          subject?: string
+          teacher?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_semester_id_fkey"
+            columns: ["semester_id"]
+            isOneToOne: false
+            referencedRelation: "semesters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       redmine_chats: {
         Row: {
           chat_id: string
@@ -70,6 +111,33 @@ export type Database = {
           created_at?: string
           id?: number
           nmProject?: string | null
+        }
+        Relationships: []
+      }
+      semesters: {
+        Row: {
+          active: boolean
+          created_at: string
+          finished_at: string
+          id: number
+          semester_sufix: string
+          started_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          finished_at: string
+          id?: number
+          semester_sufix: string
+          started_at: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          finished_at?: string
+          id?: number
+          semester_sufix?: string
+          started_at?: string
         }
         Relationships: []
       }
