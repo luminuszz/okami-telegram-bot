@@ -71,6 +71,8 @@ export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
       }
 
       await this.showRedmineNotificationByChat(chat.nmProject, chat.chat_id);
+
+      return next();
     });
   }
 
@@ -83,7 +85,7 @@ export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
   }
 
   async runVincularChatCommand() {
-    this.bot.command('vincular_chat', async (ctx) => {
+    this.bot.command('vincular_chat', async (ctx, next) => {
       const chatId = String(ctx.chat.id);
 
       const alreadySaved =
@@ -95,6 +97,8 @@ export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
         await ctx.reply(
           'Você já está vinculado a um projeto. Use o comando /desvincular_chat para desvincular o projeto atual',
         );
+
+        return next();
       }
 
       await ctx.reply(
@@ -118,6 +122,8 @@ export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
         await ctx.reply(
           '✅ Pronto! Seu chat foi vinculado com sucesso. 📲 Agora você receberá um lembrete semanal para preencher o redmine toda sexta-feira, ⏰ 16:00. Fique de olho! 👀',
         );
+
+        await next();
       });
     });
   }
