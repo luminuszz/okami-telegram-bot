@@ -1,5 +1,6 @@
-import { RedmineChatRepository } from '@modules/database/repository/redmine-chat.respository';
 import { Utils } from '@app/utils/parse-message';
+import { RedmineChatRepository } from '@modules/database/repository/redmine-chat.respository';
+import { EnvService } from '@modules/env/env.service';
 import { TELEGRAM_REMEMBER_REDMINE_BOT_PROVIDER } from '@modules/telegram/providers';
 import {
   Inject,
@@ -8,24 +9,22 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
-import { Telegraf } from 'telegraf';
-import { message } from 'telegraf/filters';
 import { Cron } from '@nestjs/schedule';
 import { format, startOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { EnvService } from '@modules/env/env.service';
+import { Telegraf } from 'telegraf';
+import { message } from 'telegraf/filters';
 
 export const EVERY_FRIDAY_AT_16_PM = '0 16 * * 5';
 
 @Injectable()
 export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
-  private readonly memoryUsers = new Map<string, boolean>();
-
   constructor(
     @Inject(TELEGRAM_REMEMBER_REDMINE_BOT_PROVIDER)
     private readonly bot: Telegraf,
 
     private readonly redmineChatRepository: RedmineChatRepository,
+
     private readonly env: EnvService,
   ) {}
 
@@ -54,7 +53,6 @@ export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleDestroy() {
-    this.memoryUsers.clear();
     await this.bot.stop();
   }
 
@@ -76,8 +74,8 @@ export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  async saveChat(chatId: string, projectName?: string) {
-    await this.redmineChatRepository.saveChat(chatId, projectName);
+  async saveChat(chatId: string, redmineUserId?: string) {
+    await this.redmineChatRepository.saveChat(chatId, redmineUserId);
   }
 
   async deleteChat(chatId: string) {
@@ -88,20 +86,27 @@ export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
     this.bot.command('vincular_chat', async (ctx) => {
       const chatId = String(ctx.chat.id);
 
+      const alreadySaved =
+        await this.redmineChatRepository.findByChatId(chatId);
+
+      console.log('alreadySaved', alreadySaved);
+
+      if (alreadySaved) {
+        await ctx.reply(
+          'Você já está vinculado a um projeto. Use o comando /desvincular_chat para desvincular o projeto atual',
+        );
+      }
+
       await ctx.reply(
-        'Por favor, me informe o nome do projeto que deseja ser notificado',
+        'Informe o id usuário do Redmine. Para saber como encontrar o seu id de usuário, clique na imagem abaixo.',
       );
 
-      this.bot.on(message('text'), async (ctx, next) => {
-        const alreadySaved = this.memoryUsers.get(chatId);
+      await ctx.replyWithPhoto({
+        filename: 'user_id_toutorial.png',
+        url: 'https://okami-storage.daviribeiro.com/user_id_toutorial.png',
+      });
 
-        if (alreadySaved) {
-          await ctx.reply(
-            'Você já está vinculado a um projeto. Use o comando /desvincular_chat para desvincular o projeto atual',
-          );
-          return next();
-        }
-
+      this.bot.on(message('text'), async (ctx) => {
         await ctx.reply(
           '⏳ Vinculando seu chat... Por favor, aguarde um momento.',
         );
@@ -110,13 +115,9 @@ export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
 
         await this.saveChat(String(ctx.chat.id), projectName);
 
-        this.memoryUsers.set(String(ctx.chat.id), true);
-
         await ctx.reply(
           '✅ Pronto! Seu chat foi vinculado com sucesso. 📲 Agora você receberá um lembrete semanal para preencher o redmine toda sexta-feira, ⏰ 16:00. Fique de olho! 👀',
         );
-
-        await next();
       });
     });
   }
@@ -131,7 +132,7 @@ export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  private mountRedmineUrl(): string {
+  private mountRedmineUrl(redmineUserId: string): string {
     const lastMondayDate = startOfWeek(new Date(), {
       weekStartsOn: 1,
       locale: ptBR,
@@ -142,25 +143,26 @@ export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
     const url = new URL(this.env.get('REMEMBER_REDMINE_URL'));
 
     url.searchParams.set('startday', formattedDate);
+    url.searchParams.set('user_id', redmineUserId);
 
     this.logger.debug(`Redmine URL: ${url.toString()}`);
 
     return url.toString();
   }
 
-  private parseClassNotificationMessage(projectName: string): string {
+  private parseClassNotificationMessage(): string {
     return Utils.parseTelegramMessage(`
       📌 *Lembrete de preenchimento do Redmine* 📌
-      Olá! Não se esqueça de preencher o redmine para o projeto *${projectName}*.
+      Olá! Não se esqueça de preencher o redmine.
       Acesse o redmine e preencha as informações necessárias.
       `);
   }
 
   private async showRedmineNotificationByChat(
-    nmProject: string,
+    redmineChatId: string,
     chatId: string,
   ) {
-    const message = this.parseClassNotificationMessage(nmProject);
+    const message = this.parseClassNotificationMessage();
 
     await this.bot.telegram.sendMessage(chatId, message, {
       parse_mode: 'MarkdownV2',
@@ -168,7 +170,7 @@ export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
 
     await this.bot.telegram.sendMessage(
       chatId,
-      `[Link do Redmine](${this.mountRedmineUrl()})`,
+      `[Link do Redmine](${this.mountRedmineUrl(redmineChatId)})`,
       {
         parse_mode: 'MarkdownV2',
       },

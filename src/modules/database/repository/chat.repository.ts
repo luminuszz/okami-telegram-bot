@@ -81,15 +81,11 @@ export class ChatRepository {
   }
 
   async findActiveSemester() {
-    const { data, error } = await this.supabase
+    const { data } = await this.supabase
       .from('semesters')
       .select('*')
       .eq('active', true)
       .single();
-
-    if (error) {
-      throw new Error(error.message);
-    }
 
     return data;
   }
