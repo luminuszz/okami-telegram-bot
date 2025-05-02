@@ -14,6 +14,7 @@ export const envSchema = z.object({
   SUPABASE_ANON_KEY: z.string(),
   SUPABASE_URL: z.string().url(),
   REMEMBER_REDMINE_URL: z.string().url(),
+  REDIS_URL_CONNECTION: z.string(),
 });
 
 export type EnvType = z.infer<typeof envSchema>;

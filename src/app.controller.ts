@@ -1,6 +1,5 @@
 import { TelegramService } from '@app/modules/telegram/bots/telegram.service';
 import { EnvService } from '@modules/env/env.service';
-import { SqsQueueProvider } from '@modules/queue/sqs-queue.provider';
 import { Controller, Get, Logger, OnModuleInit } from '@nestjs/common';
 import {
   HealthCheck,
@@ -10,6 +9,7 @@ import {
 } from '@nestjs/terminus';
 import { AxiosResponse } from 'axios';
 import { Utils } from './utils/parse-message';
+import { QueueProvider } from '@modules/queue/queue-provider';
 
 interface Notification {
   name: string;
@@ -25,7 +25,7 @@ interface Notification {
 @Controller('/')
 export class AppController implements OnModuleInit {
   constructor(
-    private readonly queue: SqsQueueProvider,
+    private readonly queue: QueueProvider,
     private readonly telegramService: TelegramService,
     private readonly healthCheckService: HealthCheckService,
     private memory: MemoryHealthIndicator,

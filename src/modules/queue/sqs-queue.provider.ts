@@ -9,9 +9,10 @@ import { Consumer } from 'sqs-consumer';
 import { EnvService } from '../env/env.service';
 import { HealthIndicatorSession } from '@nestjs/terminus/dist/health-indicator/health-indicator.service';
 import { HealthIndicatorService } from '@nestjs/terminus';
+import { QueueProvider } from '@modules/queue/queue-provider';
 
 @Injectable()
-export class SqsQueueProvider implements OnModuleDestroy {
+export class SqsQueueProvider implements OnModuleDestroy, QueueProvider {
   private consumers = new Map<string, Consumer>();
   private logger = new Logger(SqsQueueProvider.name);
   private indicator: HealthIndicatorSession;
