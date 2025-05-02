@@ -13,6 +13,6 @@ import { QueueProvider } from '@modules/queue/queue-provider';
     BullQueueProvider,
     { provide: QueueProvider, useClass: BullQueueProvider },
   ],
-  exports: [SqsQueueProvider],
+  exports: [SqsQueueProvider, QueueProvider],
 })
 export class QueueModule {}
