@@ -35,7 +35,7 @@ export class ClassNotificationBotService implements OnModuleInit {
     return this.classes;
   }
 
-  async onModuleInit() {
+  onModuleInit() {
     this.logger.debug('Class Notification bot initialized');
 
     this.indicator = this.healthIndicator.check(
@@ -60,7 +60,7 @@ export class ClassNotificationBotService implements OnModuleInit {
     void this.whatsTodayClassCommand();
 
     void this.bot.launch(() => {
-      this.logger.debug('Bot started class notificaiton bot');
+      this.logger.log('Bot started class notification bot');
     });
   }
 

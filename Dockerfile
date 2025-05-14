@@ -2,8 +2,13 @@
 ARG NODE_VERSION=23.7.0
 FROM node:${NODE_VERSION}-slim AS base
 
+
 # NestJS app lives here
 WORKDIR /app
+
+
+# Install curl for healthcheck
+RUN apk update && apk add curl
 
 # Set production environment
 ENV NODE_ENV="production"
