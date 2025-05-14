@@ -1,10 +1,6 @@
-# syntax = docker/dockerfile:1
 
-# Adjust NODE_VERSION as desired
 ARG NODE_VERSION=23.7.0
 FROM node:${NODE_VERSION}-slim AS base
-
-LABEL fly_launch_runtime="NestJS"
 
 # NestJS app lives here
 WORKDIR /app
@@ -44,4 +40,4 @@ COPY --from=build /app /app
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3005
 
-CMD ["pnpm", "exec", "pm2-runtime", "ecosystem.config.js", "--exp-backoff-restart-delay=100"]
+CMD  ["pnpm", "run", "start:prod"]
