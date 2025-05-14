@@ -8,7 +8,11 @@ WORKDIR /app
 
 
 # Install curl for healthcheck
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+# Install curl and wget
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+ && rm -rf /var/lib/apt/lists/*
 
 # Set production environment
 ENV NODE_ENV="production"
