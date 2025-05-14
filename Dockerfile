@@ -8,7 +8,7 @@ WORKDIR /app
 
 
 # Install curl for healthcheck
-RUN apk update && apk add curl
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Set production environment
 ENV NODE_ENV="production"
