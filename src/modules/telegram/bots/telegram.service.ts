@@ -1,4 +1,10 @@
-import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { HealthIndicatorService } from '@nestjs/terminus';
 import { HealthIndicatorSession } from '@nestjs/terminus/dist/health-indicator/health-indicator.service';
 import { Telegraf } from 'telegraf';
@@ -15,7 +21,7 @@ import {
 import { fmt, bold } from 'telegraf/format';
 
 @Injectable()
-export class TelegramService implements OnModuleInit {
+export class TelegramService implements OnModuleInit, OnModuleDestroy {
   private memoryUsers = new Map<string, UserMetadata>();
 
   private logger = new Logger(TelegramService.name);
@@ -58,13 +64,17 @@ export class TelegramService implements OnModuleInit {
       return ctx.reply('Comandos atualizados');
     });
 
-    void this.bot.launch(() => {
-      this.logger.debug('Bot is running');
-    });
-
     this.runVincularChatCommand();
     this.runConfirmarChatCommand();
     this.handleReceivedMessage();
+
+    void this.bot.launch(() => {
+      this.logger.debug('Bot is running');
+    });
+  }
+
+  async onModuleDestroy() {
+    await this.bot.stop();
   }
 
   private handleReceivedMessage() {
