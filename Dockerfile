@@ -1,11 +1,8 @@
 
 ARG NODE_VERSION=23.7.0
 FROM node:${NODE_VERSION}-slim AS base
-
-
 # NestJS app lives here
 WORKDIR /app
-
 
 # Install curl for healthcheck
 # Install curl and wget
@@ -24,10 +21,6 @@ RUN npm install -g pnpm@$PNPM_VERSION
 
 # Throw-away build stage to reduce size of final image
 FROM base AS build
-
-# Install packages needed to build node modules
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3
 
 # Install node modules
 COPY package.json pnpm-lock.yaml ./
