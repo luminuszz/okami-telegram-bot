@@ -12,6 +12,8 @@ import {
   payloadEmailSchema,
 } from '../utils';
 
+import { fmt, bold } from 'telegraf/format';
+
 @Injectable()
 export class TelegramService implements OnModuleInit {
   private memoryUsers = new Map<string, UserMetadata>();
@@ -37,13 +39,32 @@ export class TelegramService implements OnModuleInit {
       );
     });
 
-    this.runVincularChatCommand();
-    this.runConfirmarChatCommand();
-    this.handleReceivedMessage();
+    void this.bot.settings(async (ctx) => {
+      await ctx.telegram.setMyCommands([
+        {
+          command: '/vincularchat',
+          description: 'Vincular seu chat ao bot',
+        },
+        {
+          command: '/confirmarchat',
+          description: 'Confirmar o chat vinculado',
+        },
+        {
+          command: '/start',
+          description: 'Iniciar o bot',
+        },
+      ]);
+
+      return ctx.reply('Comandos atualizados');
+    });
 
     void this.bot.launch(() => {
       this.logger.debug('Bot is running');
     });
+
+    this.runVincularChatCommand();
+    this.runConfirmarChatCommand();
+    this.handleReceivedMessage();
   }
 
   private handleReceivedMessage() {
@@ -61,13 +82,11 @@ export class TelegramService implements OnModuleInit {
           emailSanded: true,
         });
 
-        await ctx.reply(
-          `Se **${email}** corresponder aos dados enviaremos um e-mail 
+        await ctx.reply(fmt`Se ${bold`${email}`} corresponder aos dados enviaremos um e-mail 
           com o código de acesso  use /confirmarchat e informe o código que você recebeu por e-mail
         
           /confirmarchat
-          `,
-        );
+          `);
 
         return;
       }
@@ -146,8 +165,7 @@ export class TelegramService implements OnModuleInit {
 
   async healthCheck() {
     try {
-      const botInfo = await this.bot.telegram.getMe();
-      this.logger.debug(`Bot is running. Username: ${botInfo.username}`);
+      await this.bot.telegram.getMe();
       return this.indicator.up();
     } catch (error) {
       this.logger.error('Bot is not running', error);
