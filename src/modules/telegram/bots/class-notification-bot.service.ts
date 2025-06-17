@@ -72,17 +72,23 @@ export class ClassNotificationBotService implements OnModuleInit {
     await this.chatRepository.deleteByChatId(chatId);
   }
 
+  async getDailyClassByActiveSemester() {
+    const currentDayNumber = getDay(new Date());
+
+    const classes = await this.getClassesForActiveSemester();
+
+    const currentClassForDay = classes.find(
+      (classItem) => classItem.dayNumber === currentDayNumber,
+    );
+
+    return currentClassForDay ?? null;
+  }
+
   async whatsTodayClassCommand() {
     this.bot.command('aula_hoje', async (ctx) => {
       const chatId = String(ctx.chat.id);
 
-      const currentDayNumber = getDay(new Date());
-
-      const classes = await this.getClassesForActiveSemester();
-
-      const currentClassForDay = classes.find(
-        (classItem) => classItem.dayNumber === currentDayNumber,
-      );
+      const currentClassForDay = await this.getDailyClassByActiveSemester();
 
       if (!currentClassForDay) {
         return ctx.reply('Hoje não tem aula');

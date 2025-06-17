@@ -6,9 +6,11 @@ import { QueueModule } from '@modules/queue/queue.module';
 import { TelegramModule } from '@modules/telegram/telegram.module';
 import { TerminusModule } from '@nestjs/terminus';
 import { ScheduleModule } from '@nestjs/schedule';
+import { DatabaseModule } from '@modules/database/database.module';
 
 @Module({
   imports: [
+    DatabaseModule,
     ScheduleModule.forRoot(),
     TerminusModule,
     EnvModule,

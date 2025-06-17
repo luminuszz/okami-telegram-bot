@@ -1,5 +1,4 @@
 import { ClassNotificationBotService } from '@app/modules/telegram/bots/class-notification-bot.service';
-import { DatabaseModule } from '@modules/database/database.module';
 import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { EnvModule } from '../env/env.module';
@@ -13,7 +12,7 @@ import {
 import { RememberRedmineBot } from '@modules/telegram/bots/remember-redmine-bot.service';
 
 @Module({
-  imports: [EnvModule, OkamiModule, TerminusModule, DatabaseModule],
+  imports: [EnvModule, OkamiModule, TerminusModule],
   providers: [
     telegrafProvider,
     telegrafClassNotificationProviderBot,
@@ -22,6 +21,6 @@ import { RememberRedmineBot } from '@modules/telegram/bots/remember-redmine-bot.
     ClassNotificationBotService,
     RememberRedmineBot,
   ],
-  exports: [TelegramService],
+  exports: [TelegramService, ClassNotificationBotService],
 })
 export class TelegramModule {}

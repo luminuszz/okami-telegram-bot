@@ -1,6 +1,6 @@
 import { TelegramService } from '@app/modules/telegram/bots/telegram.service';
 import { EnvService } from '@modules/env/env.service';
-import { Controller, Get, Logger, OnModuleInit } from '@nestjs/common';
+import { Controller, Get, OnModuleInit } from '@nestjs/common';
 import {
   HealthCheck,
   HealthCheckService,
@@ -10,6 +10,7 @@ import {
 import { AxiosResponse } from 'axios';
 import { Utils } from './utils/parse-message';
 import { QueueProvider } from '@modules/queue/queue-provider';
+import { ClassNotificationBotService } from '@modules/telegram/bots/class-notification-bot.service';
 
 interface Notification {
   name: string;
@@ -31,9 +32,8 @@ export class AppController implements OnModuleInit {
     private memory: MemoryHealthIndicator,
     private http: HttpHealthIndicator,
     private readonly envService: EnvService,
+    private readonly classNotificationBot: ClassNotificationBotService,
   ) {}
-
-  private logger = new Logger(AppController.name);
 
   onModuleInit() {
     void this.queue.subscribe('SEND_TELEGRAM_NOTIFICATION', (data) =>
@@ -74,5 +74,10 @@ export class AppController implements OnModuleInit {
           (res: AxiosResponse<{ status: string }>) => res.data.status === 'ok',
         ),
     ]);
+  }
+
+  @Get('/classroom/daily')
+  async fetchClassroomDaily() {
+    return this.classNotificationBot.getDailyClassByActiveSemester();
   }
 }
