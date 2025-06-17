@@ -7,9 +7,18 @@ import { TelegramModule } from '@modules/telegram/telegram.module';
 import { TerminusModule } from '@nestjs/terminus';
 import { ScheduleModule } from '@nestjs/schedule';
 import { DatabaseModule } from '@modules/database/database.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 10,
+        },
+      ],
+    }),
     DatabaseModule,
     ScheduleModule.forRoot(),
     TerminusModule,
