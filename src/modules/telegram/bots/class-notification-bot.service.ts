@@ -8,6 +8,10 @@ import { ClassRoom } from '@app/utils/constants';
 import { Utils } from '@app/utils/parse-message';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ChatRepository } from '@modules/database/repository/chat.repository';
+import {
+  AlertType,
+  ClassAlertRepository,
+} from '@modules/database/repository/class-alert.repository';
 
 @Injectable()
 export class ClassNotificationBotService implements OnModuleInit {
@@ -21,6 +25,7 @@ export class ClassNotificationBotService implements OnModuleInit {
     private readonly bot: Telegraf,
     private readonly healthIndicator: HealthIndicatorService,
     private readonly chatRepository: ChatRepository,
+    private readonly alertRepository: ClassAlertRepository,
   ) {}
 
   public async getClassesForActiveSemester() {
@@ -181,5 +186,9 @@ export class ClassNotificationBotService implements OnModuleInit {
 `;
 
     return Utils.parseTelegramMessage(message);
+  }
+
+  async createAlert(chatId: string, type: AlertType) {
+    await this.alertRepository.createAlert(type, chatId);
   }
 }
