@@ -16,8 +16,8 @@ import { RememberRedmineBot } from '@modules/telegram/bots/remember-redmine-bot.
   providers: [
     telegrafProvider,
     telegrafClassNotificationProviderBot,
-    TelegramService,
     telegrafRememberRedmineBotProvider,
+    TelegramService,
     ClassNotificationBotService,
     RememberRedmineBot,
   ],

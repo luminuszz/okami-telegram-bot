@@ -44,7 +44,7 @@ export class ClassNotificationBotService implements OnModuleInit {
 
     this.bot.start((ctx) => {
       const message = `
-          🎓 * Bem-vindo ao Class Notification Bot! * 🎓
+          🎓 *Bem-vindo ao Class Notification Bot!* 🎓
           - Para *receber notificações* de novas aulas, use: /vincularchat  
           - Para *parar de receber notificações*, use: /desvincularchat  
           - Para *saber qual é a aula de hoje*, use: /aula_hoje  
@@ -76,11 +76,6 @@ export class ClassNotificationBotService implements OnModuleInit {
     const currentDayNumber = weekDay ?? getDay(new Date());
 
     const classes = await this.getClassesForActiveSemester();
-
-    console.log({
-      currentDayNumber,
-      classes,
-    });
 
     return classes.filter(
       (classItem) => classItem.dayNumber === currentDayNumber,
