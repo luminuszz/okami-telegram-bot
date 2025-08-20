@@ -48,6 +48,7 @@ export class ClassNotificationBotService implements OnModuleInit {
           - Para *receber notificações* de novas aulas, use: /vincularchat  
           - Para *parar de receber notificações*, use: /desvincularchat  
           - Para *saber qual é a aula de hoje*, use: /aula_hoje  
+          - Para *ver as aulas da semana*, use: /aulas_semana
           `;
 
       ctx.reply(Utils.parseTelegramMessage(message), {
@@ -58,6 +59,7 @@ export class ClassNotificationBotService implements OnModuleInit {
     void this.runVincularChatCommand();
     void this.runDesvincularChatCommand();
     void this.whatsTodayClassCommand();
+    void this.showWeeklyClassesCommand();
 
     void this.bot.launch(() => {
       this.logger.log('Bot started class notification bot');
@@ -90,6 +92,19 @@ export class ClassNotificationBotService implements OnModuleInit {
 
       for (const currentClassForDay of currentClassesForDay) {
         const message = this.parseClassNotificationMessage(currentClassForDay);
+        await this.showDayClassByChat(message, chatId);
+      }
+    });
+  }
+
+  async showWeeklyClassesCommand() {
+    this.bot.command('aulas_semana', async (ctx) => {
+      const chatId = String(ctx.chat.id);
+
+      const allClassesBySemester = await this.getClassesForActiveSemester();
+
+      for (const classItem of allClassesBySemester) {
+        const message = this.parseClassNotificationMessage(classItem);
         await this.showDayClassByChat(message, chatId);
       }
     });
