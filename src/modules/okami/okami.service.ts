@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AxiosError } from 'axios';
 import { firstValueFrom } from 'rxjs';
 import { Either, left, right } from '../helpers';
@@ -19,8 +19,6 @@ import {
 export class OkamiService {
   constructor(private readonly httpClient: HttpService) {}
 
-  private logger = new Logger(OkamiService.name);
-
   async updateTelegramChatId(data: UpdateTelegramChatId) {
     try {
       const results = await updateTelegramChatIdSchema.parseAsync(data);
@@ -28,7 +26,7 @@ export class OkamiService {
       return right(
         firstValueFrom(
           this.httpClient.patch(
-            '/notification/telegram/update-chat-id',
+            '/integration/telegram/update-chat-id',
             results,
           ),
         ),
@@ -44,10 +42,7 @@ export class OkamiService {
 
       right(
         firstValueFrom(
-          this.httpClient.post(
-            '/notification/telegram/send-auth-code',
-            results,
-          ),
+          this.httpClient.post('/integration/telegram/send-auth-code', results),
         ),
       );
     } catch (err) {
@@ -63,7 +58,7 @@ export class OkamiService {
 
       const response = await firstValueFrom(
         this.httpClient.post<{ isMatch: boolean }>(
-          '/notification/telegram/compare-auth-code',
+          '/integration/telegram/compare-auth-code',
           results,
         ),
       );
@@ -82,7 +77,7 @@ export class OkamiService {
 
       const response = await firstValueFrom(
         this.httpClient.get<{ subscriber: Subscriber }>(
-          `/notification/telegram/find/${results.email}`,
+          `/integration/telegram/find/${results.email}`,
         ),
       );
 
