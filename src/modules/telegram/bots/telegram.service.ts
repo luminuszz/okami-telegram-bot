@@ -157,17 +157,32 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
   }
 
   async sendMessage({ chatId, message, imageUrl }: SendMessagePayload) {
-    const isAllowedImageFiletype = ['png', 'jpg', 'jpeg', 'webp'].includes(
-      imageUrl?.split('.')?.pop() ?? '',
-    );
+    const fileType = imageUrl?.split('.').pop() ?? '';
 
-    if (imageUrl && isAllowedImageFiletype) {
-      await this.bot.telegram.sendPhoto(chatId, imageUrl, {
+    const isAllowedImageFiletype = [
+      'png',
+      'jpg',
+      'jpeg',
+      'webp',
+      'gif',
+    ].includes(fileType);
+
+    if (!imageUrl || !isAllowedImageFiletype) {
+      await this.bot.telegram.sendMessage(chatId, message, {
+        parse_mode: 'MarkdownV2',
+      });
+
+      return;
+    }
+
+    if (fileType === 'gif') {
+      await this.bot.telegram.sendAnimation(chatId, imageUrl, {
         caption: message,
         parse_mode: 'MarkdownV2',
       });
     } else {
-      await this.bot.telegram.sendMessage(chatId, message, {
+      await this.bot.telegram.sendPhoto(chatId, imageUrl, {
+        caption: message,
         parse_mode: 'MarkdownV2',
       });
     }

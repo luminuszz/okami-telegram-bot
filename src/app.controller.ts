@@ -1,12 +1,6 @@
 import { TelegramService } from '@app/modules/telegram/bots/telegram.service';
 import { EnvService } from '@modules/env/env.service';
-import {
-  Controller,
-  Get,
-  OnModuleInit,
-  ParseIntPipe,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, OnModuleInit, Query } from '@nestjs/common';
 import {
   HealthCheck,
   HealthCheckService,
