@@ -1,4 +1,3 @@
-
 ARG NODE_VERSION=23.7.0
 FROM node:${NODE_VERSION}-slim AS base
 # NestJS app lives here
@@ -9,7 +8,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
- && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 # Set production environment
 ENV NODE_ENV="production"
