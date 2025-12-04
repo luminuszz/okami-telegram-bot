@@ -1,14 +1,10 @@
-import type { TelegramService } from "@app/modules/telegram/bots/telegram.service";
-import type { EnvService } from "@modules/env/env.service";
-import type { QueueProvider } from "@modules/queue/queue-provider";
-import type { ClassNotificationBotService } from "@modules/telegram/bots/class-notification-bot.service";
-import { Controller, Get, type OnModuleInit, Query } from "@nestjs/common";
-import {
-	HealthCheck,
-	type HealthCheckService,
-	type HttpHealthIndicator,
-	type MemoryHealthIndicator,
-} from "@nestjs/terminus";
+import { TelegramService } from "@app/modules/telegram/bots/telegram.service";
+import { EnvService } from "@modules/env/env.service";
+import { IaPromptProvider } from "@modules/ia/providers/ia-prompt.provider";
+import { QueueProvider } from "@modules/queue/queue-provider";
+import { ClassNotificationBotService } from "@modules/telegram/bots/class-notification-bot.service";
+import { Controller, Get, type OnModuleInit, Post, Query } from "@nestjs/common";
+import { HealthCheck, HealthCheckService, HttpHealthIndicator, MemoryHealthIndicator } from "@nestjs/terminus";
 import type { AxiosResponse } from "axios";
 import { Utils } from "./utils/parse-message";
 
@@ -33,20 +29,17 @@ export class AppController implements OnModuleInit {
 		private http: HttpHealthIndicator,
 		private readonly envService: EnvService,
 		private readonly classNotificationBot: ClassNotificationBotService,
+		private readonly isProvider: IaPromptProvider,
 	) {}
 
 	onModuleInit() {
-		void this.queue.subscribe("SEND_TELEGRAM_NOTIFICATION", (data) =>
-			this.sendUnreadWorkTelegramNotification(data),
-		);
+		void this.queue.subscribe("SEND_TELEGRAM_NOTIFICATION", (data) => this.sendUnreadWorkTelegramNotification(data));
 	}
 
 	async sendUnreadWorkTelegramNotification(notification: Notification) {
 		const { message, url, imageUrl, chatId } = notification;
 
-		const parsedMessage = Utils.parseTelegramMessage(
-			`${message.toString()}\n\n${url}`,
-		);
+		const parsedMessage = Utils.parseTelegramMessage(`${message.toString()}\n\n${url}`);
 
 		await this.telegramService.sendMessage({
 			message: parsedMessage,
@@ -78,8 +71,6 @@ export class AppController implements OnModuleInit {
 
 	@Get("/classroom/daily")
 	async fetchClassroomDaily(@Query("weekDay") weekDay?: string) {
-		return this.classNotificationBot.getDailyClassByActiveSemester(
-			Number(weekDay),
-		);
+		return this.classNotificationBot.getDailyClassByActiveSemester(Number(weekDay));
 	}
 }
