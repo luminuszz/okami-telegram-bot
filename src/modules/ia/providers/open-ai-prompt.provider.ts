@@ -54,7 +54,8 @@ export class OpenAiPromptProvider implements IaPromptProvider, OnModuleInit {
     Determine valor sempre que aparecer no texto.
     Se a notificação não for financeira, devolva:
     {
-      "tipo": "nao_financeiro",
+      "type": "no_financial",
+      "amount": null,
       "raw": "<texto original>"
     }
     Notificação: ${JSON.stringify(message)}

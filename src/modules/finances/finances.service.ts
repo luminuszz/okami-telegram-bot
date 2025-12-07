@@ -17,6 +17,10 @@ export class FinancesService {
 
 		this.logger.debug(analysis);
 
+		if (analysis.type === "no_financial") {
+			return;
+		}
+
 		await this.supabase.from("balances").insert({
 			amount: analysis.amount,
 			balance: analysis.balance,

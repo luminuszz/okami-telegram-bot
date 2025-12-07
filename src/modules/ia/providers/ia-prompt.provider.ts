@@ -14,6 +14,7 @@ export const NotificationType = {
 	Payment: "payment",
 	Invoice: "invoice",
 	Alert: "alert",
+	NotFinancial: "no_financial",
 } as const;
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
