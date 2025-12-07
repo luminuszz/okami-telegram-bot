@@ -29,7 +29,7 @@ export class FinancesService {
 			description: analysis.description,
 			raw: JSON.stringify(analysis.raw),
 			source: analysis.source,
-			timestamp: analysis.timestamp,
+			timestamp: new Date().toISOString(),
 			type: analysis.type,
 		});
 	}
