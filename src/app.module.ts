@@ -1,5 +1,6 @@
 import { EnvModule } from "@app/modules/env/env.module";
 import { DatabaseModule } from "@modules/database/database.module";
+import { FinancesModule } from "@modules/finances/finances.module";
 import { IaModule } from "@modules/ia/ia.module";
 import { OkamiModule } from "@modules/okami/okami.module";
 import { QueueModule } from "@modules/queue/queue.module";
@@ -9,7 +10,6 @@ import { ScheduleModule } from "@nestjs/schedule";
 import { TerminusModule } from "@nestjs/terminus";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { AppController } from "./app.controller";
-import { FinancesController } from "./finances.controller";
 
 @Module({
 	imports: [
@@ -29,8 +29,9 @@ import { FinancesController } from "./finances.controller";
 		QueueModule,
 		OkamiModule,
 		TelegramModule,
+		FinancesModule,
 	],
-	controllers: [AppController, FinancesController],
+	controllers: [AppController],
 	providers: [],
 })
 export class AppModule {}

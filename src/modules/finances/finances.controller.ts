@@ -1,10 +1,11 @@
-import { IaPromptProvider, NotificationMobileMessage } from "@modules/ia/providers/ia-prompt.provider";
+import { FinancesService } from "@modules/finances/finances.service";
+import { NotificationMobileMessage } from "@modules/ia/providers/ia-prompt.provider";
 import { BadRequestException, Body, Controller, Post } from "@nestjs/common";
 import { z } from "zod";
 
 @Controller("/finances")
 export class FinancesController {
-	constructor(private readonly iaProvider: IaPromptProvider) {}
+	constructor(private readonly financesService: FinancesService) {}
 
 	@Post("/")
 	async analyzeNotification(@Body() data: NotificationMobileMessage) {
@@ -23,12 +24,6 @@ export class FinancesController {
 			});
 		}
 
-		const analysis = await this.iaProvider.processNotificationMessage(results.data);
-
-		return {
-			analysis: {
-				...analysis,
-			},
-		};
+		const analysis = await this.financesService.saveBalance(results.data);
 	}
 }

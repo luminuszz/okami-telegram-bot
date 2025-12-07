@@ -26,6 +26,7 @@ export interface TransactionNotification {
 	description?: string;
 	timestamp: string; // ISO 8601
 	raw: string;
+	balance: string;
 }
 
 export abstract class IaPromptProvider {

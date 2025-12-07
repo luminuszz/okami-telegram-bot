@@ -28,6 +28,16 @@ export class OpenAiPromptProvider implements IaPromptProvider, OnModuleInit {
     Use o campo <fonte> para indicar o nome do banco, se possível.
     Resuma o texto original no campo <descricao>.
     Retorne o ammount em centavos (100 = R$1,00).
+    Preciso que você seja muito preciso na identificação do tipo de notificação.
+    Exemplo de notificação financeira:
+    "Você recebeu um PIX de R$150,00 de João Silva. Saldo atual R$1.250,00"
+    Exemplo de notificação não financeira:
+    "Seu código de verificação é 123456. Não compartilhe com ninguém."
+    Preciso que você identifique se  notficação financeira foi de entrada ou saída de dinheiro.
+    Se for entrada, use tipos: pix_received, refund
+    Se for saída, use tipos: pix_sent, card_purchase, transfer, payment, invoice
+    Se for apenas um alerta sem movimentação financeira, use tipo: alert
+
 
     Saídas MUST:
     {
@@ -38,6 +48,7 @@ export class OpenAiPromptProvider implements IaPromptProvider, OnModuleInit {
         "description": "summarized original text",
         "timestamp": "<ISO>",
         "raw": "<original text>"
+        balance: <Informe se e do tipo "incress" ou "decress">
     }
 
     Determine valor sempre que aparecer no texto.
