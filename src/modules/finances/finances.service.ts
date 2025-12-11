@@ -1,18 +1,26 @@
 import { SUPABASE_DATABASE_PROVIDER, SupabaseDatabaseProvider } from "@modules/database/supabase-database.provider";
 import { IaPromptProvider, NotificationMobileMessage } from "@modules/ia/providers/ia-prompt.provider";
-import { Inject, Injectable, Logger } from "@nestjs/common";
+import { QueueProvider } from "@modules/queue/queue-provider";
+import { Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 
 @Injectable()
-export class FinancesService {
+export class FinancesService implements OnModuleInit {
 	constructor(
 		@Inject(SUPABASE_DATABASE_PROVIDER)
 		private readonly supabase: SupabaseDatabaseProvider,
 		private readonly iaPromptProvider: IaPromptProvider,
+		private readonly queueProvider: QueueProvider,
 	) {}
+
+	private readonly saveBalanceQueue = "finances.save-balance";
+
+	onModuleInit() {
+		this.queueProvider.subscribe<NotificationMobileMessage>(this.saveBalanceQueue, this.executeSaveBalanace.bind(this));
+	}
 
 	private logger = new Logger(this.constructor.name);
 
-	async saveBalance(notification: NotificationMobileMessage) {
+	private async executeSaveBalanace(notification: NotificationMobileMessage) {
 		const analysis = await this.iaPromptProvider.processNotificationMessage(notification);
 
 		this.logger.debug(analysis);
@@ -32,6 +40,10 @@ export class FinancesService {
 			timestamp: new Date().toISOString(),
 			type: analysis.type,
 		});
+	}
+
+	async saveBalance(notification: NotificationMobileMessage) {
+		await this.queueProvider.publish(this.saveBalanceQueue, notification);
 	}
 
 	async fetchBalancesTotal() {
