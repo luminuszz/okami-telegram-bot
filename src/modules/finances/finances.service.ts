@@ -67,6 +67,7 @@ export class FinancesService {
 		return {
 			incress: results.incress / 100,
 			decress: results.decress / 100,
+			balance: (results.incress - results.decress) / 100,
 		};
 	}
 
