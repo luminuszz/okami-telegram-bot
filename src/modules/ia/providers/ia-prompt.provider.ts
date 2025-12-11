@@ -27,7 +27,7 @@ export interface TransactionNotification {
 	description?: string;
 	timestamp: string; // ISO 8601
 	raw: string;
-	balance: string;
+	balance: "incress" | "decress";
 }
 
 export abstract class IaPromptProvider {

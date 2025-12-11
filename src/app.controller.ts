@@ -29,11 +29,12 @@ export class AppController implements OnModuleInit {
 		private http: HttpHealthIndicator,
 		private readonly envService: EnvService,
 		private readonly classNotificationBot: ClassNotificationBotService,
-		private readonly isProvider: IaPromptProvider,
 	) {}
 
 	onModuleInit() {
-		void this.queue.subscribe("SEND_TELEGRAM_NOTIFICATION", (data) => this.sendUnreadWorkTelegramNotification(data));
+		void this.queue.subscribe<Notification>("SEND_TELEGRAM_NOTIFICATION", (data) =>
+			this.sendUnreadWorkTelegramNotification(data),
+		);
 	}
 
 	async sendUnreadWorkTelegramNotification(notification: Notification) {
@@ -58,7 +59,7 @@ export class AppController implements OnModuleInit {
 	async healthCheck() {
 		return this.healthCheckService.check([
 			() => this.telegramService.healthCheck(),
-			() => this.queue.healthCheck(),
+			() => this.queue.healthCheck() as any,
 			() => this.memory.checkHeap("memory_heap", 150 * 1024 * 1024),
 			() =>
 				this.http.responseCheck(

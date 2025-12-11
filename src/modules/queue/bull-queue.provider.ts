@@ -21,7 +21,7 @@ export class BullQueueProvider implements QueueProvider {
 		this.indicator = this.healthIndicator.check("queue_provider");
 	}
 
-	async publish<Payload = any>(name: string, payload: Payload): Promise<void> {
+	async publish<Payload = unknown>(name: string, payload: Payload): Promise<void> {
 		let existsQueue = this.queues.get(name);
 
 		if (!existsQueue) {
@@ -46,7 +46,10 @@ export class BullQueueProvider implements QueueProvider {
 		await existsQueue.add(name, payload);
 	}
 
-	subscribe<Payload = any>(name: string, callback: (payload: Payload) => Promise<void> | void): Promise<void> | void {
+	subscribe<Payload = unknown>(
+		name: string,
+		callback: (payload: Payload) => Promise<void> | void,
+	): Promise<void> | void {
 		let existsWorker = this.workers.get(name);
 
 		if (!existsWorker) {

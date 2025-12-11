@@ -1,6 +1,6 @@
 import { FinancesService } from "@modules/finances/finances.service";
 import { NotificationMobileMessage } from "@modules/ia/providers/ia-prompt.provider";
-import { BadRequestException, Body, Controller, Post } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Post } from "@nestjs/common";
 import { z } from "zod";
 
 @Controller("/finances")
@@ -24,6 +24,16 @@ export class FinancesController {
 			});
 		}
 
-		const analysis = await this.financesService.saveBalance(results.data);
+		await this.financesService.saveBalance(results.data);
+	}
+
+	@Get("/total")
+	async fetchBalancesTotal() {
+		return this.financesService.fetchBalancesTotal();
+	}
+
+	@Get()
+	async fetchBalances() {
+		return this.financesService.fetchBalancesHistory();
 	}
 }

@@ -11,12 +11,16 @@ export type SupabaseDatabaseProvider = SupabaseClient<SupabaseDatabaseType>;
 export const supabaseDatabaseProvider: Provider = {
 	provide: SUPABASE_DATABASE_PROVIDER,
 	useFactory(env: EnvService): SupabaseDatabaseProvider {
-		return createClient<SupabaseDatabaseType>(env.get("SUPABASE_URL"), env.get("SUPABASE_SERVICE_ROLE_KEY"), {
-			auth: {
-				autoRefreshToken: false,
-				persistSession: false,
+		return createClient<SupabaseDatabaseType>(
+			env.get("SUPABASE_URL"),
+			env.get("SUPABASE_SERVICE_ROLE_KEY"),
+			{
+				auth: {
+					autoRefreshToken: false,
+					persistSession: false,
+				},
 			},
-		});
+		);
 	},
 	inject: [EnvService],
 };

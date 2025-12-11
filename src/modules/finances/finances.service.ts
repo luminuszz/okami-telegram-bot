@@ -33,4 +33,52 @@ export class FinancesService {
 			type: analysis.type,
 		});
 	}
+
+	async fetchBalancesTotal() {
+		const defaultValues = {
+			incress: 0,
+			decress: 0,
+		};
+
+		const { data, error } = await this.supabase
+			.from("balances")
+			.select("*")
+			.filter("balance", "not.eq", null)
+			.order("created_at", { ascending: false });
+
+		if (error) {
+			throw new Error(`Failed to fetch balances: ${error.message}`);
+		}
+
+		if (!data) {
+			return defaultValues;
+		}
+
+		const results = data?.reduce((acc, current) => {
+			if (current.balance && current.amount) {
+				acc[current.balance] = (acc[current.balance] ?? 0) + current.amount;
+			}
+
+			return acc;
+		}, defaultValues);
+
+		this.logger.debug(results);
+
+		return {
+			incress: results.incress / 100,
+			decress: results.decress / 100,
+		};
+	}
+
+	async fetchBalancesHistory() {
+		const { data, error } = await this.supabase
+			.from("balances")
+			.select("*")
+			.filter("balance", "not.eq", null)
+			.order("created_at", { ascending: false });
+
+		if (error) throw new Error(`Failed to fetch balances: ${error.message}`);
+
+		return data?.length ? data : [];
+	}
 }
