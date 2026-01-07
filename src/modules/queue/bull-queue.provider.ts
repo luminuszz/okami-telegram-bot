@@ -76,7 +76,7 @@ export class BullQueueProvider implements QueueProvider {
 		this.logger.debug(`Worker ${callback.name}  in job ${name} is subscribed `);
 	}
 
-	healthCheck() {
+	async healthCheck() {
 		const checkList: { name: string; active: boolean }[] = [];
 
 		for (const [key, consumer] of this.workers.entries()) {
@@ -88,8 +88,6 @@ export class BullQueueProvider implements QueueProvider {
 			this.logger.debug(`Health check for ${key}: ${consumer.isRunning() ? "UP" : "DOWN"}`);
 		}
 
-		const isHeath = checkList.every((check) => check.active);
-
-		return isHeath ? this.indicator.up() : this.indicator.down();
+		return checkList.every((check) => check.active);
 	}
 }
