@@ -1,25 +1,19 @@
 import { QueueProvider } from "@modules/queue/queue-provider";
 import { REDIS_CONNECTION, RedisClient } from "@modules/queue/redis-provider";
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { HealthIndicatorService } from "@nestjs/terminus";
-import { HealthIndicatorSession } from "@nestjs/terminus/dist/health-indicator/health-indicator.service";
 import { Queue, Worker } from "bullmq";
 
 @Injectable()
 export class BullQueueProvider implements QueueProvider {
 	private workers = new Map<string, Worker>();
 	private queues = new Map<string, Queue>();
-	private indicator: HealthIndicatorSession;
 
 	private logger = new Logger(BullQueueProvider.name);
 
 	constructor(
 		@Inject(REDIS_CONNECTION)
 		private readonly redisClient: RedisClient,
-		private readonly healthIndicator: HealthIndicatorService,
-	) {
-		this.indicator = this.healthIndicator.check("queue_provider");
-	}
+	) {}
 
 	async publish<Payload = unknown>(name: string, payload: Payload): Promise<void> {
 		let existsQueue = this.queues.get(name);

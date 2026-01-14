@@ -23,7 +23,9 @@ export class OkamiService {
 		try {
 			const results = await updateTelegramChatIdSchema.parseAsync(data);
 
-			return right(firstValueFrom(this.httpClient.patch("/integration/telegram/update-chat-id", results)));
+			await firstValueFrom(this.httpClient.patch("/integration/telegram/update-chat-id", results));
+
+			return right(true);
 		} catch (err) {
 			return left(err);
 		}
@@ -33,7 +35,9 @@ export class OkamiService {
 		try {
 			const results = await sendAuthCodeByEmailSchema.parseAsync(data);
 
-			right(firstValueFrom(this.httpClient.post("/integration/telegram/send-auth-code", results)));
+			await firstValueFrom(this.httpClient.post("/integration/telegram/send-auth-code", results));
+
+			return right(true);
 		} catch (err) {
 			return left(err);
 		}
