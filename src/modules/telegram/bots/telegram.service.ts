@@ -173,6 +173,7 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       for (const subscriber of subscribers) {
         await this.okami.deleteTelegramChatId(subscriber.subscriberId);
       }
+      await ctx.reply("O bot foi desvinculado do seu chat com sucesso.");
     });
   }
 
