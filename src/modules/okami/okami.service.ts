@@ -90,7 +90,7 @@ export class OkamiService {
   ): Promise<FetchSubscibersByChatIdResponse> {
     const { data } = await firstValueFrom(
       this.httpClient.get<FetchSubscibersByChatIdResponse>(
-        "/integration/telegram/subscribers_by_chat",
+        "/integration/telegram/subscribers",
         {
           params: {
             chat_id,

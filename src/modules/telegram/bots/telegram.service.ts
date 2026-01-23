@@ -44,33 +44,11 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       );
     });
 
-    void this.bot.settings(async (ctx) => {
-      await ctx.telegram.setMyCommands([
-        {
-          command: "/vincularchat",
-          description: "Vincular seu chat ao bot",
-        },
-        {
-          command: "/confirmarchat",
-          description: "Confirmar o chat vinculado",
-        },
-        {
-          command: "/start",
-          description: "Iniciar o bot",
-        },
-        {
-          command: "/pararbot",
-          description: "Desvincula o bot do chat",
-        },
-      ]);
-
-      return ctx.reply("Comandos atualizados");
-    });
-
     this.runVincularChatCommand();
     this.runConfirmarChatCommand();
-    this.handleReceivedMessage();
     this.runPararBotCommand();
+
+    this.handleReceivedMessage();
 
     void this.bot.launch(() => {
       this.logger.debug("Bot is running");
@@ -162,18 +140,23 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
 
   private runPararBotCommand() {
     this.bot.command("pararbot", async (ctx) => {
+      await ctx.reply("Desvinculando o bot do seu chat...");
+
       const subscribers = await this.okami.fetchSubscribersByChatId(
         ctx.chat.id.toString(),
       );
 
       if (!subscribers.length) {
-        return ctx.reply("Nenhum chat vinculado encontrado para este usuário.");
+        await ctx.reply("Nenhum chat vinculado encontrado para este usuário.");
+        return;
       }
 
       for (const subscriber of subscribers) {
         await this.okami.deleteTelegramChatId(subscriber.subscriberId);
+        await ctx.reply(
+          `O bot foi desvinculado do chat do seu usuário ${subscriber.email}`,
+        );
       }
-      await ctx.reply("O bot foi desvinculado do seu chat com sucesso.");
     });
   }
 
