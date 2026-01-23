@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const updateTelegramChatIdSchema = z.object({
   recipientId: z.string(),
@@ -30,3 +30,9 @@ export type Subscriber = {
   id: string;
   recipientId: string;
 };
+
+export type FetchSubscibersByChatIdResponse = {
+  email: string;
+  subscriberId: string;
+  recipientId: string;
+}[];
