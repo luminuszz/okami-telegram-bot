@@ -1,8 +1,8 @@
 import {
   SUPABASE_DATABASE_PROVIDER,
   SupabaseDatabaseProvider,
-} from '@modules/database/supabase-database.provider';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+} from "@modules/database/supabase-database.provider";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 
 @Injectable()
 export class ChatRepository {
@@ -15,13 +15,13 @@ export class ChatRepository {
 
   async saveChat(chatId: string) {
     const { data: existsNote } = await this.supabase
-      .from('chats')
+      .from("chats")
       .select()
-      .eq('chat_id', chatId)
+      .eq("chat_id", chatId)
       .single();
 
     if (!existsNote) {
-      const { error } = await this.supabase.from('chats').insert([
+      const { error } = await this.supabase.from("chats").insert([
         {
           chat_id: chatId,
         },
@@ -35,9 +35,9 @@ export class ChatRepository {
 
   async deleteByChatId(chatId: string) {
     const { error } = await this.supabase
-      .from('chats')
+      .from("chats")
       .delete()
-      .eq('chat_id', chatId);
+      .eq("chat_id", chatId);
 
     if (error) {
       throw new Error(error.message);
@@ -50,7 +50,7 @@ export class ChatRepository {
 
     while (hasMore) {
       const { data: chats, error } = await this.supabase
-        .from('chats')
+        .from("chats")
         .select()
         .range(offset, offset + batchSize - 1);
 
@@ -69,9 +69,10 @@ export class ChatRepository {
 
   async fetchClassesBySemester(semesterId: number) {
     const { data: classes, error } = await this.supabase
-      .from('class')
+      .from("class")
       .select()
-      .eq('semester_id', semesterId);
+      .eq("semester_id", semesterId)
+      .order("dayNumber", { ascending: true });
 
     if (error) {
       throw new Error(error.message);
@@ -82,9 +83,9 @@ export class ChatRepository {
 
   async findActiveSemester() {
     const { data } = await this.supabase
-      .from('semesters')
-      .select('*')
-      .eq('active', true)
+      .from("semesters")
+      .select("*")
+      .eq("active", true)
       .single();
 
     return data;
