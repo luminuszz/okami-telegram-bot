@@ -74,6 +74,9 @@ importers:
       bullmq:
         specifier: ^5.52.1
         version: 5.52.1
+      bullmq-otel:
+        specifier: ^1.1.1
+        version: 1.1.1
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -2542,6 +2545,9 @@ packages:
 
   buffer@5.7.1:
     resolution: {integrity: sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==}
+
+  bullmq-otel@1.1.1:
+    resolution: {integrity: sha512-AySECCquHi/wE4kQUVVUr55I0CNVJDD7cisATTkUX21rBgphOf3qraoqCIllsxAQ32OJ0FtaTvZOrV2APrNgoA==}
 
   bullmq@5.52.1:
     resolution: {integrity: sha512-u7CSV9wID3MBEX2DNubEErbAlrADgm8abUBAi6h8rQTnuTkhhgMs2iD7uhqplK8lIgUOkBIW3sDJWaMSInH47A==}
@@ -8282,6 +8288,14 @@ snapshots:
     dependencies:
       base64-js: 1.5.1
       ieee754: 1.2.1
+
+  bullmq-otel@1.1.1:
+    dependencies:
+      '@opentelemetry/api': 1.9.0
+      bullmq: 5.52.1
+      tslib: 2.8.1
+    transitivePeerDependencies:
+      - supports-color
 
   bullmq@5.52.1:
     dependencies:

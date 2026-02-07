@@ -2,6 +2,7 @@ import { QueueProvider } from "@modules/queue/queue-provider";
 import { REDIS_CONNECTION, RedisClient } from "@modules/queue/redis-provider";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { Queue, Worker } from "bullmq";
+import { BullMQOtel } from "bullmq-otel";
 
 @Injectable()
 export class BullQueueProvider implements QueueProvider {
@@ -30,6 +31,7 @@ export class BullQueueProvider implements QueueProvider {
 						delay: 1000,
 					},
 				},
+				telemetry: new BullMQOtel(name),
 			});
 			this.queues.set(name, existsQueue);
 		}
@@ -55,6 +57,7 @@ export class BullQueueProvider implements QueueProvider {
 				},
 				{
 					connection: this.redisClient,
+					telemetry: new BullMQOtel(name),
 				},
 			);
 
