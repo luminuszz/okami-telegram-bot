@@ -1,9 +1,8 @@
 import { TelegramService } from "@app/modules/telegram/bots/telegram.service";
 import { EnvService } from "@modules/env/env.service";
-import { IaPromptProvider } from "@modules/ia/providers/ia-prompt.provider";
 import { QueueProvider } from "@modules/queue/queue-provider";
 import { ClassNotificationBotService } from "@modules/telegram/bots/class-notification-bot.service";
-import { Controller, Get, type OnModuleInit, Post, Query } from "@nestjs/common";
+import { Controller, Get, type OnModuleInit, Query } from "@nestjs/common";
 import { HealthCheck, HealthCheckService, HttpHealthIndicator, MemoryHealthIndicator } from "@nestjs/terminus";
 import type { AxiosResponse } from "axios";
 import { Utils } from "./utils/parse-message";

@@ -3,6 +3,8 @@ import { NestFactory } from "@nestjs/core";
 import helmet from "helmet";
 import { AppModule } from "./app.module";
 
+import "./modules/tracing/sdk";
+
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 
