@@ -14,7 +14,7 @@ const apiSdk = new NodeSDK({
 	}),
 	autoDetectResources: true,
 	traceExporter: new OTLPTraceExporter({
-		url: `${process.env.JAEGER_ENDPOINT}/v1/traces`,
+		url: process.env.JAEGER_ENDPOINT,
 	}),
 	instrumentations: [getNodeAutoInstrumentations()],
 });
