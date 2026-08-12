@@ -4,7 +4,6 @@ import { Module } from "@nestjs/common";
 import { TerminusModule } from "@nestjs/terminus";
 import { EnvModule } from "../env/env.module";
 import { OkamiModule } from "../okami/okami.module";
-import { TelegramService } from "./bots/telegram.service";
 import {
 	telegrafClassNotificationProviderBot,
 	telegrafProvider,
@@ -20,6 +19,6 @@ import {
 		ClassNotificationBotService,
 		RememberRedmineBot,
 	],
-	exports: [TelegramService, ClassNotificationBotService],
+	exports: [ClassNotificationBotService],
 })
 export class TelegramModule {}
