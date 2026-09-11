@@ -7,6 +7,7 @@ import { Inject, Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { getDay } from "date-fns";
 import { Telegraf } from "telegraf";
+import { getWebhookUrl } from "../utils";
 
 @Injectable()
 export class ClassNotificationBotService implements OnModuleInit {
@@ -36,7 +37,7 @@ export class ClassNotificationBotService implements OnModuleInit {
 	}
 
 	async onModuleInit() {
-		this.logger.debug("Class Notification bot initialized");
+		this.logger.log("Class Notification bot initialized");
 
 		this.bot.start((ctx) => {
 			const message = `
@@ -60,7 +61,7 @@ export class ClassNotificationBotService implements OnModuleInit {
 		const isProd = this.env.get("NODE_ENV") === "production";
 		if (isProd) {
 			const domain = this.env.get("APP_DOMAIN");
-			await this.bot.telegram.setWebhook(`${domain}/webhooks/telegram/class`);
+			await this.bot.telegram.setWebhook(getWebhookUrl(domain, "/webhooks/telegram/class"));
 			this.logger.log("Webhook configured for Class Bot");
 		} else {
 			void this.bot.launch(() => {

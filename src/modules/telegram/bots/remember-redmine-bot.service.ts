@@ -8,6 +8,7 @@ import { format, startOfWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Telegraf } from "telegraf";
 import { message } from "telegraf/filters";
+import { getWebhookUrl } from "../utils";
 
 export const EVERY_FRIDAY_AT_16_PM = "0 16 * * 5";
 
@@ -44,11 +45,11 @@ export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
 		const isProd = this.env.get("NODE_ENV") === "production";
 		if (isProd) {
 			const domain = this.env.get("APP_DOMAIN");
-			await this.bot.telegram.setWebhook(`${domain}/webhooks/telegram/redmine`);
-			this.logger.debug("Webhook configured for Redmine Bot");
+			await this.bot.telegram.setWebhook(getWebhookUrl(domain, "/webhooks/telegram/redmine"));
+			this.logger.log("Webhook configured for Redmine Bot");
 		} else {
 			void this.bot.launch(() => {
-				this.logger.debug("Redmine bot initialized via Long Polling");
+				this.logger.log("Redmine bot initialized via Long Polling");
 			});
 		}
 	}

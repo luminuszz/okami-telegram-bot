@@ -23,3 +23,11 @@ export type SendMessagePayload = {
   imageUrl?: string;
   chatId: string;
 };
+
+export function getWebhookUrl(domain: string | undefined, path: string): string {
+  if (!domain) {
+    throw new Error("APP_DOMAIN is not set. Webhook cannot be configured.");
+  }
+  const normalizedDomain = domain.endsWith("/") ? domain.slice(0, -1) : domain;
+  return `${normalizedDomain}${path}`;
+}

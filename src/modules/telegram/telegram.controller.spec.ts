@@ -35,6 +35,8 @@ describe("TelegramController", () => {
 		const res = {} as unknown as Response;
 		await controller.handleOkamiBot(req, res);
 		expect(mockOkamiBot.handleUpdate).toHaveBeenCalledWith(req.body, res);
+		expect(mockClassBot.handleUpdate).not.toHaveBeenCalled();
+		expect(mockRedmineBot.handleUpdate).not.toHaveBeenCalled();
 	});
 
 	it("should call handleUpdate on class bot", async () => {
@@ -42,6 +44,8 @@ describe("TelegramController", () => {
 		const res = {} as unknown as Response;
 		await controller.handleClassBot(req, res);
 		expect(mockClassBot.handleUpdate).toHaveBeenCalledWith(req.body, res);
+		expect(mockOkamiBot.handleUpdate).not.toHaveBeenCalled();
+		expect(mockRedmineBot.handleUpdate).not.toHaveBeenCalled();
 	});
 
 	it("should call handleUpdate on redmine bot", async () => {
@@ -49,5 +53,7 @@ describe("TelegramController", () => {
 		const res = {} as unknown as Response;
 		await controller.handleRedmineBot(req, res);
 		expect(mockRedmineBot.handleUpdate).toHaveBeenCalledWith(req.body, res);
+		expect(mockOkamiBot.handleUpdate).not.toHaveBeenCalled();
+		expect(mockClassBot.handleUpdate).not.toHaveBeenCalled();
 	});
 });

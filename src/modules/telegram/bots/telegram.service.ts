@@ -7,7 +7,7 @@ import { bold, fmt } from "telegraf/format";
 import { EnvService } from "../../env/env.service";
 import { OkamiService } from "../../okami/okami.service";
 import { TELEGRAM_PROVIDER } from "../providers";
-import { payloadAthCodeSchema, payloadEmailSchema, SendMessagePayload, UserMetadata } from "../utils";
+import { getWebhookUrl, payloadAthCodeSchema, payloadEmailSchema, SendMessagePayload, UserMetadata } from "../utils";
 
 @Injectable()
 export class TelegramService implements OnModuleInit, OnModuleDestroy {
@@ -42,11 +42,11 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
 		const isProd = this.env.get("NODE_ENV") === "production";
 		if (isProd) {
 			const domain = this.env.get("APP_DOMAIN");
-			await this.bot.telegram.setWebhook(`${domain}/webhooks/telegram/okami`);
-			this.logger.debug("Webhook configured for Okami Bot");
+			await this.bot.telegram.setWebhook(getWebhookUrl(domain, "/webhooks/telegram/okami"));
+			this.logger.log("Webhook configured for Okami Bot");
 		} else {
 			void this.bot.launch(() => {
-				this.logger.debug("Okami Bot is running via Long Polling");
+				this.logger.log("Okami Bot is running via Long Polling");
 			});
 		}
 	}
