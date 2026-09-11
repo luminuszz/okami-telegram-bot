@@ -1,6 +1,8 @@
 import { z } from "zod";
 
 export const envSchema = z.object({
+	NODE_ENV: z.string().default("development"),
+	APP_DOMAIN: z.string().default(""),
 	TELEGRAM_CLASS_NOTIFICATION_BOT: z.string(),
 	TELEGRAM_REMEMBER_REDMINE_BOT: z.string(),
 	TELEGRAM_NOTIFICATION_BOT: z.string(),
