@@ -10,9 +10,11 @@ import {
 	telegrafProvider,
 	telegrafRememberRedmineBotProvider,
 } from "./providers/telegraf.provider";
+import { TelegramController } from "./telegram.controller";
 
 @Module({
 	imports: [EnvModule, OkamiModule, TerminusModule],
+	controllers: [TelegramController],
 	providers: [
 		telegrafProvider,
 		telegrafClassNotificationProviderBot,
