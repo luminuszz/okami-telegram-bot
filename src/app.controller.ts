@@ -48,11 +48,13 @@ export class AppController implements OnModuleInit {
 
 		const error = data.data as Error;
 
+		const messageText = Utils.parseTelegramMessage(`🚨 *Error Traced in workers*
+        ${JSON.stringify(error)}
+      `);
+
 		await this.telegramService.sendMessage({
 			chatId: "5887244798",
-			message: `🚨 *Error Traced in workers*
-        ${JSON.stringify(error)}
-      `,
+			message: messageText,
 		});
 	}
 

@@ -39,7 +39,7 @@ export class ClassNotificationBotService implements OnModuleInit {
 	async onModuleInit() {
 		this.logger.log("Class Notification bot initialized");
 
-		this.bot.start((ctx) => {
+		this.bot.start(async (ctx) => {
 			const message = `
           🎓 *Bem-vindo ao Class Notification Bot!* 🎓
           - Para *receber notificações* de novas aulas, use: /vincularchat
@@ -48,9 +48,17 @@ export class ClassNotificationBotService implements OnModuleInit {
           - Para *ver as aulas da semana*, use: /aulas_semana
           `;
 
-			ctx.reply(Utils.parseTelegramMessage(message), {
-				parse_mode: "MarkdownV2",
-			});
+			try {
+				await ctx.reply(Utils.parseTelegramMessage(message), {
+					parse_mode: "MarkdownV2",
+				});
+			} catch (error: any) {
+				if (error?.response?.error_code === 403) {
+					this.logger.warn(`User ${ctx.chat?.id} blocked the bot on start.`);
+				} else {
+					this.logger.error(error);
+				}
+			}
 		});
 
 		void this.runVincularChatCommand();
@@ -162,9 +170,18 @@ export class ClassNotificationBotService implements OnModuleInit {
 	}
 
 	async showDayClassByChat(message: string, chatId: string) {
-		await this.bot.telegram.sendMessage(chatId, Utils.parseTelegramMessage(message), {
-			parse_mode: "MarkdownV2",
-		});
+		try {
+			await this.bot.telegram.sendMessage(chatId, Utils.parseTelegramMessage(message), {
+				parse_mode: "MarkdownV2",
+			});
+		} catch (error: any) {
+			if (error?.response?.error_code === 403) {
+				this.logger.warn(`User ${chatId} blocked the bot. Removing from database...`);
+				await this.removeChatId(chatId);
+			} else {
+				throw error;
+			}
+		}
 	}
 
 	parseClassNotificationMessage(payload: ClassRoom) {
