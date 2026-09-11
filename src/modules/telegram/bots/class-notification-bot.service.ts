@@ -1,6 +1,7 @@
 import { ClassRoom } from "@app/utils/constants";
 import { Utils } from "@app/utils/parse-message";
 import { ChatRepository } from "@modules/database/repository/chat.repository";
+import { EnvService } from "@modules/env/env.service";
 import { CLASS_NOTIFICATION_BOT_PROVIDER } from "@modules/telegram/providers";
 import { Inject, Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
@@ -17,6 +18,7 @@ export class ClassNotificationBotService implements OnModuleInit {
 		@Inject(CLASS_NOTIFICATION_BOT_PROVIDER)
 		private readonly bot: Telegraf,
 		private readonly chatRepository: ChatRepository,
+		private readonly env: EnvService,
 	) {}
 
 	public async getClassesForActiveSemester() {
@@ -33,7 +35,7 @@ export class ClassNotificationBotService implements OnModuleInit {
 		return this.classes;
 	}
 
-	onModuleInit() {
+	async onModuleInit() {
 		this.logger.debug("Class Notification bot initialized");
 
 		this.bot.start((ctx) => {
@@ -55,9 +57,16 @@ export class ClassNotificationBotService implements OnModuleInit {
 		void this.whatsTodayClassCommand();
 		void this.showWeeklyClassesCommand();
 
-		void this.bot.launch(() => {
-			this.logger.log("Bot started class notification bot");
-		});
+		const isProd = this.env.get("NODE_ENV") === "production";
+		if (isProd) {
+			const domain = this.env.get("APP_DOMAIN");
+			await this.bot.telegram.setWebhook(`${domain}/webhooks/telegram/class`);
+			this.logger.log("Webhook configured for Class Bot");
+		} else {
+			void this.bot.launch(() => {
+				this.logger.log("Class bot started via Long Polling");
+			});
+		}
 	}
 
 	private async saveChatId(chatId: string) {

@@ -41,9 +41,16 @@ export class RememberRedmineBot implements OnModuleInit, OnModuleDestroy {
 		void this.desvincularChatCommand();
 		void this.showNotification();
 
-		void this.bot.launch(() => {
-			this.logger.debug("Redmine bot Notification bot initialized");
-		});
+		const isProd = this.env.get("NODE_ENV") === "production";
+		if (isProd) {
+			const domain = this.env.get("APP_DOMAIN");
+			await this.bot.telegram.setWebhook(`${domain}/webhooks/telegram/redmine`);
+			this.logger.debug("Webhook configured for Redmine Bot");
+		} else {
+			void this.bot.launch(() => {
+				this.logger.debug("Redmine bot initialized via Long Polling");
+			});
+		}
 	}
 
 	async onModuleDestroy() {
