@@ -40,7 +40,7 @@ export class AppController implements OnModuleInit {
 			this.sendUnreadWorkTelegramNotification(data),
 		);
 
-		void this.queue.subscribe<TracingJobData>("tracing", (data) => this.handleTracingJob(data));
+		//	void this.queue.subscribe<TracingJobData>("tracing", (data) => this.handleTracingJob(data));
 	}
 
 	async handleTracingJob(data: TracingJobData) {
